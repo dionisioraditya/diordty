@@ -19,12 +19,15 @@ class ProjectFactory extends Factory
     public function definition(): array
     {
         $title = fake()->sentence(rand(3, 5));
+        $img = "/wallpaper.jpg";
+        $githubLink = "https://github.com/dionisioraditya/agv_ws";
         return [
             'title' => $title,
             'slug' => str()->slug($title),
-            'image' => fake()->imageUrl(),
+            'image' => $img,
             'description' => fake()->paragraph(),
-            'github_link' => fake()->url(),
+            'demo_link' => fake()->url(),
+            'github_link' => $githubLink,
             'video_link' => fake()->url(),
             'category_id' => Category::factory(),
         ];

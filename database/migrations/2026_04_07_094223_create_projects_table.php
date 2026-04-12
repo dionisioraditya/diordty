@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('image')->nullable();
             $table->text('description')->nullable();
+            $table->text('demo_link')->nullable();
             $table->text('github_link')->nullable();
             $table->text('video_link')->nullable();
             $table->foreignId('category_id')->nullable()->constrained(table: 'categories', indexName: 'projects_category_id');

@@ -37,7 +37,9 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        return Inertia::render('projectPage', [
+        $project->load('techstacks');
+
+        return Inertia::render('Project', [
         'project' => $project,
         ]);
         

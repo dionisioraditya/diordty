@@ -11,7 +11,7 @@ class Project extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'slug', 'image', 'description', 'github_link', 'video_link', 'category_id'];
+    protected $fillable = ['title', 'slug', 'image', 'description', 'demo_link', 'github_link', 'video_link', 'category_id'];
 
     public function category(): BelongsTo
     {
