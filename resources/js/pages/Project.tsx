@@ -173,7 +173,20 @@ export default function Project({ project }: Props) {
                                                             key={item.id}
                                                             className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs font-medium text-white/80"
                                                         >
-                                                            {item.name}
+                                                            {item.icon && (
+                                                                <img
+                                                                    title={
+                                                                        item.name
+                                                                    }
+                                                                    src={
+                                                                        item.icon
+                                                                    }
+                                                                    alt={
+                                                                        item.name
+                                                                    }
+                                                                    className="h-5 w-5"
+                                                                />
+                                                            )}
                                                         </span>
                                                     ))}
                                                 </div>
