@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Category extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['name', 'slug', 'color'];
+
     public function projects() : HasMany
     {
         return $this->hasMany(Project::class);
