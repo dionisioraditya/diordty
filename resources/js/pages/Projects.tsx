@@ -51,7 +51,7 @@ export default function Projects({ projects, categories, filters }: Props) {
                         category={filters.category}
                     />
                     {projects.data.length > 0 ? (
-                        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 pt-10 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 px-4 pt-10 sm:grid-cols-2 lg:grid-cols-3">
                             {projects.data.map((project) => (
                                 <PostsCard key={project.id} project={project} />
                             ))}

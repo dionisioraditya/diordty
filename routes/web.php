@@ -14,7 +14,7 @@ Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name
 //     'canRegister' => Features::enabled(Features::registration()),
 // ])->name('welcome');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 });
 

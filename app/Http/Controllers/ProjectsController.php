@@ -32,7 +32,7 @@ class ProjectsController extends Controller
                 });
             })
             ->latest()
-            ->paginate(6)
+            ->paginate(8)
             ->withQueryString();
 
         return Inertia::render('Projects', [

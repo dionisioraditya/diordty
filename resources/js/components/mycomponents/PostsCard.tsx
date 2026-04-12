@@ -42,58 +42,61 @@ export default function PostsCard({ project }: Props) {
         'bg-muted text-muted-foreground ring-1 ring-inset ring-border';
 
     return (
-        <div className="bg-neutral-primary-soft border-default rounded-4xl shadow-xs block max-w-sm border bg-[rgba(10,14,25,0.55)] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.18)] shadow-lg backdrop-blur-md hover:shadow-[0_0_20px_5px_rgba(79,70,229,0.6)]">
+        <div className="bg-neutral-primary-soft border-default block w-full overflow-hidden rounded-2xl border bg-[rgba(10,14,25,0.55)] p-0 shadow-[0_10px_30px_rgba(0,0,0,0.18)] shadow-lg shadow-xs backdrop-blur-md hover:shadow-[0_0_20px_5px_rgba(79,70,229,0.6)]">
             <a href={`/projects/${project.slug}`}>
-                <div className="rounded-base h-38 w-full overflow-hidden">
+                <div className="relative overflow-hidden">
                     <img
-                        className="rounded-4xl h-full w-full object-cover"
+                        className="h-50 w-full object-cover"
                         src="wallpaper.jpg"
                         alt=""
                     />
-                </div>
-
-                <div className="pt-5 opacity-40">
                     <a
                         href={`/projects?category=${project.category.slug}`}
-                        className={`inline-flex rounded-full px-3 py-1 text-xs ${categoryBadgeClass}`}
+                        className={`absolute top-4 left-4 inline-flex rounded-full px-3 py-1 font-mono text-xs opacity-40 ${categoryBadgeClass}`}
                     >
                         {project.category?.name}
                     </a>
                 </div>
 
-                <a href="#">
-                    <h5 className="text-heading mb-2 mt-6 text-2xl font-semibold tracking-tight">
-                        {project.title}
-                    </h5>
-                </a>
-
-                <p className="text-body mb-6">
-                    {project.description.slice(0, 100)}
-                </p>
-
-                <a
-                    href="#"
-                    className="text-body bg-neutral-secondary-medium border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading rounded-base shadow-xs box-border inline-flex items-center border px-4 py-2.5 text-sm font-medium leading-5"
-                >
-                    Read more
-                    <svg
-                        className="-me-0.5 ms-1.5 h-4 w-4 rtl:rotate-180"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        viewBox="0 0 24 24"
+                <div className="flex min-h-fit flex-col gap-2 pt-2 pl-6">
+                    <a
+                        href={`/projects/${project.slug}`}
+                        className="line-clamp-2 max-w-full text-sm leading-tight font-semibold tracking-tight break-words text-white"
                     >
-                        <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M19 12H5m14 0-4 4m4-4-4-4"
-                        />
-                    </svg>
-                </a>
+                        {project.title}
+                    </a>
+
+                    <div
+                        className="line-clamp-2 min-h-14 font-sans text-base leading-7 text-white/75 [&_p]:m-0 [&_p]:text-base [&_p]:leading-7 [&_p]:text-white/75"
+                        dangerouslySetInnerHTML={{
+                            __html: project.description.slice(0, 20),
+                        }}
+                    />
+
+                    <a
+                        href={`/projects/${project.slug}`}
+                        className="text-body bg-neutral-secondary-medium border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading rounded-base mt-auto mb-2 box-border inline-flex w-fit items-center border px-4 py-0 text-sm leading-5 font-medium shadow-xs"
+                    >
+                        Read more
+                        <svg
+                            className="ms-1.5 -me-0.5 h-4 w-4 rtl:rotate-180"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M19 12H5m14 0-4 4m4-4-4-4"
+                            />
+                        </svg>
+                    </a>
+                </div>
             </a>
         </div>
     );

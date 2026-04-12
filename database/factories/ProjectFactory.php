@@ -21,6 +21,7 @@ class ProjectFactory extends Factory
         $title = fake()->sentence(rand(3, 5));
         $img = "/wallpaper.jpg";
         $githubLink = "https://github.com/dionisioraditya/agv_ws";
+        $videoLink = "https://youtu.be/KcNXDKpNqNw?si=NL5yFm-pXUo7W94v";
         return [
             'title' => $title,
             'slug' => str()->slug($title),
@@ -28,7 +29,8 @@ class ProjectFactory extends Factory
             'description' => fake()->paragraph(),
             'demo_link' => fake()->url(),
             'github_link' => $githubLink,
-            'video_link' => fake()->url(),
+            'video_link' => $videoLink,
+            'info' => fake()->sentence(rand(10, 20)),
             'category_id' => Category::factory(),
         ];
     }
