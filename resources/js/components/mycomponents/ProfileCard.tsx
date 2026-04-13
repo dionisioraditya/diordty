@@ -525,7 +525,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                             />
                             {showUserInfo && (
                                 <div
-                                    className="pointer-events-auto absolute z-[2] flex items-center justify-between border border-white/10 backdrop-blur-[30px]"
+                                    className="pointer-events-auto absolute z-[2] flex items-center justify-between border border-white/10 bg-cyan-950 opacity-90 backdrop-blur-[30px]"
                                     style={
                                         {
                                             '--ui-inset': '20px',
@@ -533,8 +533,8 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                                             bottom: 'var(--ui-inset)',
                                             left: 'var(--ui-inset)',
                                             right: 'var(--ui-inset)',
-                                            background:
-                                                'rgba(255, 255, 255, 0.1)',
+                                            // background:
+                                            //     '[0_0_18px_rgba(103,232,249,0.8)',
                                             borderRadius:
                                                 'calc(max(0px, var(--card-radius) - var(--ui-inset) + var(--ui-radius-bias)))',
                                             padding: '12px 14px',
@@ -542,38 +542,11 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                                     }
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div
-                                            className="flex-shrink-0 overflow-hidden rounded-full border border-white/10"
-                                            style={{
-                                                width: '48px',
-                                                height: '48px',
-                                            }}
-                                        >
-                                            <img
-                                                className="h-full w-full rounded-full object-cover"
-                                                src={miniAvatarUrl || avatarUrl}
-                                                alt={`${name || 'User'} mini avatar`}
-                                                loading="lazy"
-                                                style={{
-                                                    display: 'block',
-                                                    gridArea: 'auto',
-                                                    borderRadius: '50%',
-                                                    pointerEvents: 'auto',
-                                                }}
-                                                onError={(e) => {
-                                                    const t =
-                                                        e.target as HTMLImageElement;
-                                                    t.style.opacity = '0.5';
-                                                    t.src = avatarUrl;
-                                                }}
-                                            />
-                                        </div>
+                                        <div className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_18px_rgba(103,232,249,0.8)]"></div>
                                         <div className="flex flex-col items-start gap-1.5">
-                                            <div className="text-sm leading-none font-medium text-white/90">
-                                                @{handle}
-                                            </div>
                                             <div className="text-sm leading-none text-white/70">
-                                                {status}
+                                                {/* {status} */}
+                                                Open to work
                                             </div>
                                         </div>
                                     </div>
@@ -616,7 +589,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                                 }}
                             >
                                 <h3
-                                    className="m-0 font-semibold"
+                                    className="m-0 font-mono"
                                     style={{
                                         fontSize: 'min(5svh, 3em)',
                                         color: 'rgba(255, 255, 255, 0.92)',
@@ -626,7 +599,8 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                                         pointerEvents: 'auto',
                                     }}
                                 >
-                                    {name}
+                                    {/* {name} */}
+                                    Hello there!
                                 </h3>
                                 <p
                                     className="mx-auto w-min font-semibold whitespace-nowrap"
@@ -642,7 +616,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                                         pointerEvents: 'auto',
                                     }}
                                 >
-                                    {title}
+                                    {/* {title} */}
                                 </p>
                             </div>
                         </div>

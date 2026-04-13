@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Support\ProjectDescriptionSanitizer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -38,11 +39,14 @@ class ProjectController extends Controller
     public function show(Project $project)
     {
         $project->load('techstacks');
+        $project->description = ProjectDescriptionSanitizer::sanitize(
+            $project->description,
+        );
 
         return Inertia::render('Project', [
-        'project' => $project,
+            'project' => $project,
         ]);
-        
+
     }
 
     /**

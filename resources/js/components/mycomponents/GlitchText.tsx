@@ -1,94 +1,178 @@
-import { FC, CSSProperties } from 'react';
+'use client';
+
+import { type FC, useEffect, useRef, useState } from 'react';
 
 interface GlitchTextProps {
     children: string;
     speed?: number;
+    pauseDuration?: number;
+    glitchDuration?: number;
     enableShadows?: boolean;
     enableOnHover?: boolean;
     className?: string;
 }
 
-interface CustomCSSProperties extends CSSProperties {
-    '--after-duration': string;
-    '--before-duration': string;
-    '--after-shadow': string;
-    '--before-shadow': string;
-}
-
 const GlitchText: FC<GlitchTextProps> = ({
     children,
-    speed = 0.5,
+    speed = 3.0,
+    pauseDuration = 1200,
+    glitchDuration = 250,
     enableShadows = true,
     enableOnHover = false,
     className = '',
 }) => {
-    const inlineStyles: CustomCSSProperties = {
-        '--after-duration': `${speed * 3}s`,
-        '--before-duration': `${speed * 2}s`,
-        '--after-shadow': enableShadows ? '-5px 0 red' : 'none',
-        '--before-shadow': enableShadows ? '5px 0 cyan' : 'none',
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [isHovered, setIsHovered] = useState(false);
+    const [frame, setFrame] = useState(0);
+    const [isGlitching, setIsGlitching] = useState(false);
+
+    const clipPaths = [
+        'inset(10% 0 85% 0)',
+        'inset(45% 0 40% 0)',
+        'inset(80% 0 5% 0)',
+        'inset(10% 0 60% 0)',
+        'inset(70% 0 20% 0)',
+        'inset(25% 0 50% 0)',
+        'inset(55% 0 35% 0)',
+        'inset(5% 0 75% 0)',
+        'inset(90% 0 2% 0)',
+        'inset(30% 0 55% 0)',
+        'inset(15% 0 70% 0)',
+        'inset(65% 0 25% 0)',
+        'inset(40% 0 45% 0)',
+        'inset(85% 0 10% 0)',
+        'inset(20% 0 65% 0)',
+        'inset(50% 0 30% 0)',
+        'inset(75% 0 15% 0)',
+        'inset(35% 0 52% 0)',
+        'inset(60% 0 28% 0)',
+        'inset(8% 0 82% 0)',
+    ];
+
+    const shouldAnimate = enableOnHover ? isHovered : true;
+
+    useEffect(() => {
+        if (!shouldAnimate) {
+            setIsGlitching(false);
+            return;
+        }
+
+        const intervalMs = (speed * 1000) / clipPaths.length;
+        let frameInterval: ReturnType<typeof setInterval> | null = null;
+        let cycleTimeout: ReturnType<typeof setTimeout> | null = null;
+
+        const clearTimers = () => {
+            if (frameInterval) {
+                clearInterval(frameInterval);
+                frameInterval = null;
+            }
+
+            if (cycleTimeout) {
+                clearTimeout(cycleTimeout);
+                cycleTimeout = null;
+            }
+
+            setIsGlitching(false);
+        };
+
+        const startPause = () => {
+            setIsGlitching(false);
+            cycleTimeout = setTimeout(() => {
+                startGlitch();
+            }, pauseDuration);
+        };
+
+        const startGlitch = () => {
+            setFrame((f) => (f + 1) % clipPaths.length);
+            setIsGlitching(true);
+
+            frameInterval = setInterval(() => {
+                setFrame((f) => (f + 1) % clipPaths.length);
+            }, intervalMs);
+
+            cycleTimeout = setTimeout(() => {
+                if (frameInterval) {
+                    clearInterval(frameInterval);
+                    frameInterval = null;
+                }
+
+                startPause();
+            }, glitchDuration);
+        };
+
+        startPause();
+
+        return () => clearTimers();
+    }, [shouldAnimate, speed, pauseDuration, glitchDuration, clipPaths.length]);
+
+    const containerStyle: React.CSSProperties = {
+        position: 'relative',
+        display: 'inline-block',
+        // cursor: 'pointer',
+        userSelect: 'none',
     };
 
-    const baseClasses =
-        'text-white text-[clamp(2rem,10vw,8rem)] font-black relative mx-auto select-none cursor-pointer';
+    const textStyle: React.CSSProperties = {
+        position: 'relative',
+        fontSize: '64px',
+        fontWeight: 900,
+        color: 'white',
+    };
 
-    const pseudoClasses = !enableOnHover
-        ? 'after:content-[attr(data-text)] after:absolute after:top-0 after:left-[10px] after:text-white after:bg-[#060010] after:overflow-hidden after:[clip-path:inset(0_0_0_0)] after:[text-shadow:var(--after-shadow)] after:animate-glitch-after ' +
-          'before:content-[attr(data-text)] before:absolute before:top-0 before:left-[-10px] before:text-white before:bg-[#060010] before:overflow-hidden before:[clip-path:inset(0_0_0_0)] before:[text-shadow:var(--before-shadow)] before:animate-glitch-before'
-        : "after:content-[''] after:absolute after:top-0 after:left-[10px] after:text-white after:bg-[#060010] after:overflow-hidden after:[clip-path:inset(0_0_0_0)] after:opacity-0 " +
-          "before:content-[''] before:absolute before:top-0 before:left-[-10px] before:text-white before:bg-[#060010] before:overflow-hidden before:[clip-path:inset(0_0_0_0)] before:opacity-0 " +
-          'hover:after:content-[attr(data-text)] hover:after:opacity-100 hover:after:[text-shadow:var(--after-shadow)] hover:after:animate-glitch-after ' +
-          'hover:before:content-[attr(data-text)] hover:before:opacity-100 hover:before:[text-shadow:var(--before-shadow)] hover:before:animate-glitch-before';
+    const layerBaseStyle: React.CSSProperties = {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        fontSize: '64px',
+        fontWeight: 900,
+        color: 'white',
+        background: 'black',
+        overflow: 'hidden',
+    };
 
-    const combinedClasses = `${baseClasses} ${pseudoClasses} ${className}`;
+    const afterIndex = frame;
+    const beforeIndex = (frame + 10) % clipPaths.length;
+
+    const showLayers = shouldAnimate && isGlitching;
+
+    const afterStyle: React.CSSProperties = {
+        ...layerBaseStyle,
+        left: '10px',
+        textShadow: enableShadows ? '-5px 0 red' : 'none',
+        clipPath: showLayers ? clipPaths[afterIndex] : 'inset(0 0 100% 0)',
+        opacity: showLayers ? 1 : 0,
+        transition: 'opacity 0.1s',
+    };
+
+    const beforeStyle: React.CSSProperties = {
+        ...layerBaseStyle,
+        left: '-10px',
+        textShadow: enableShadows ? '5px 0 cyan' : 'none',
+        clipPath: showLayers ? clipPaths[beforeIndex] : 'inset(0 0 100% 0)',
+        opacity: showLayers ? 1 : 0,
+        transition: 'opacity 0.1s',
+    };
 
     return (
-        <div
-            style={inlineStyles}
-            data-text={children}
-            className={combinedClasses}
+        <a
+            className={className}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            // ref={containerRef}
+            tabIndex={0}
+            style={containerStyle}
         >
-            {children}
-        </div>
+            <span style={textStyle}>{children}</span>
+            <span aria-hidden="true" style={beforeStyle}>
+                {children}
+            </span>
+            <span aria-hidden="true" style={afterStyle}>
+                {children}
+            </span>
+        </a>
     );
 };
 
 export default GlitchText;
-
-// tailwind.config.js
-// module.exports = {
-//   theme: {
-//     extend: {
-//       keyframes: {
-//         glitch: {
-//           "0%": { "clip-path": "inset(20% 0 50% 0)" },
-//           "5%": { "clip-path": "inset(10% 0 60% 0)" },
-//           "10%": { "clip-path": "inset(15% 0 55% 0)" },
-//           "15%": { "clip-path": "inset(25% 0 35% 0)" },
-//           "20%": { "clip-path": "inset(30% 0 40% 0)" },
-//           "25%": { "clip-path": "inset(40% 0 20% 0)" },
-//           "30%": { "clip-path": "inset(10% 0 60% 0)" },
-//           "35%": { "clip-path": "inset(15% 0 55% 0)" },
-//           "40%": { "clip-path": "inset(25% 0 35% 0)" },
-//           "45%": { "clip-path": "inset(30% 0 40% 0)" },
-//           "50%": { "clip-path": "inset(20% 0 50% 0)" },
-//           "55%": { "clip-path": "inset(10% 0 60% 0)" },
-//           "60%": { "clip-path": "inset(15% 0 55% 0)" },
-//           "65%": { "clip-path": "inset(25% 0 35% 0)" },
-//           "70%": { "clip-path": "inset(30% 0 40% 0)" },
-//           "75%": { "clip-path": "inset(40% 0 20% 0)" },
-//           "80%": { "clip-path": "inset(20% 0 50% 0)" },
-//           "85%": { "clip-path": "inset(10% 0 60% 0)" },
-//           "90%": { "clip-path": "inset(15% 0 55% 0)" },
-//           "95%": { "clip-path": "inset(25% 0 35% 0)" },
-//           "100%": { "clip-path": "inset(30% 0 40% 0)" },
-//         },
-//       },
-//       animation: {
-//         "glitch-after": "glitch var(--after-duration) infinite linear alternate-reverse",
-//         "glitch-before": "glitch var(--before-duration) infinite linear alternate-reverse",
-//       },
-//     },
-//   },
-//   plugins: [],
-// };

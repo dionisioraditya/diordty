@@ -1,4 +1,5 @@
 import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { RichTextEditor } from '@/components/mycomponents/RichTextEditor';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -22,7 +23,12 @@ import { dashboard } from '@/routes';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
-type Techstack = { id: number; name: string; slug: string; icon?: string | null };
+type Techstack = {
+    id: number;
+    name: string;
+    slug: string;
+    icon?: string | null;
+};
 type Category = { id: number; name: string; slug: string; color: string };
 type Project = {
     id: number;
@@ -46,9 +52,11 @@ type PageProps = {
     errors: Record<string, string>;
 };
 
-type DeleteState =
-    | null
-    | { type: 'techstack' | 'category' | 'project'; id: number; label: string };
+type DeleteState = null | {
+    type: 'techstack' | 'category' | 'project';
+    id: number;
+    label: string;
+};
 
 const emptyTechstackForm = { name: '', icon: '' };
 const emptyCategoryForm = { name: '', color: 'bg-blue-100' };
@@ -80,7 +88,9 @@ function DashboardPanel({
             <div className="mb-4 flex items-start justify-between gap-4">
                 <div>
                     <h2 className="text-lg font-semibold">{title}</h2>
-                    <p className="text-sm text-muted-foreground">{description}</p>
+                    <p className="text-sm text-muted-foreground">
+                        {description}
+                    </p>
                 </div>
                 {action}
             </div>
@@ -110,7 +120,9 @@ function DashboardListItem({
                     {badge}
                 </div>
                 {subtitle && (
-                    <p className="truncate text-sm text-muted-foreground">{subtitle}</p>
+                    <p className="truncate text-sm text-muted-foreground">
+                        {subtitle}
+                    </p>
                 )}
             </div>
 
@@ -134,9 +146,15 @@ export default function Dashboard() {
     const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
     const [projectDialogOpen, setProjectDialogOpen] = useState(false);
     const [deleteState, setDeleteState] = useState<DeleteState>(null);
-    const [editingTechstackId, setEditingTechstackId] = useState<number | null>(null);
-    const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
-    const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
+    const [editingTechstackId, setEditingTechstackId] = useState<number | null>(
+        null,
+    );
+    const [editingCategoryId, setEditingCategoryId] = useState<number | null>(
+        null,
+    );
+    const [editingProjectId, setEditingProjectId] = useState<number | null>(
+        null,
+    );
 
     const techstackForm = useForm(emptyTechstackForm);
     const categoryForm = useForm(emptyCategoryForm);
@@ -206,7 +224,8 @@ export default function Dashboard() {
             video_link: project.video_link ?? '',
             info: project.info ?? '',
             category_id: project.category_id ? String(project.category_id) : '',
-            techstack_ids: project.techstacks?.map((item) => String(item.id)) ?? [],
+            techstack_ids:
+                project.techstacks?.map((item) => String(item.id)) ?? [],
         });
         setProjectDialogOpen(true);
     };
@@ -215,7 +234,9 @@ export default function Dashboard() {
         const url = editingTechstackId
             ? `/dashboard/techstacks/${editingTechstackId}`
             : '/dashboard/techstacks';
-        const action = editingTechstackId ? techstackForm.patch : techstackForm.post;
+        const action = editingTechstackId
+            ? techstackForm.patch
+            : techstackForm.post;
 
         action(url, {
             preserveScroll: true,
@@ -231,7 +252,9 @@ export default function Dashboard() {
         const url = editingCategoryId
             ? `/dashboard/categories/${editingCategoryId}`
             : '/dashboard/categories';
-        const action = editingCategoryId ? categoryForm.patch : categoryForm.post;
+        const action = editingCategoryId
+            ? categoryForm.patch
+            : categoryForm.post;
 
         action(url, {
             preserveScroll: true,
@@ -272,7 +295,9 @@ export default function Dashboard() {
         projectForm.setData(
             'techstack_ids',
             projectForm.data.techstack_ids.includes(techstackId)
-                ? projectForm.data.techstack_ids.filter((id) => id !== techstackId)
+                ? projectForm.data.techstack_ids.filter(
+                      (id) => id !== techstackId,
+                  )
                 : [...projectForm.data.techstack_ids, techstackId],
         );
     };
@@ -312,7 +337,9 @@ export default function Dashboard() {
                                                 </span>
                                             ) : undefined
                                         }
-                                        onEdit={() => openEditTechstack(techstack)}
+                                        onEdit={() =>
+                                            openEditTechstack(techstack)
+                                        }
                                         onDelete={() =>
                                             setDeleteState({
                                                 type: 'techstack',
@@ -352,7 +379,9 @@ export default function Dashboard() {
                                                 {category.color}
                                             </span>
                                         }
-                                        onEdit={() => openEditCategory(category)}
+                                        onEdit={() =>
+                                            openEditCategory(category)
+                                        }
                                         onDelete={() =>
                                             setDeleteState({
                                                 type: 'category',
@@ -412,7 +441,9 @@ export default function Dashboard() {
                 <div className="rounded-xl border border-sidebar-border/70 bg-background/60 p-5 dark:border-sidebar-border">
                     <div className="mb-4 flex items-start justify-between gap-4">
                         <div>
-                            <h2 className="text-lg font-semibold">Project List</h2>
+                            <h2 className="text-lg font-semibold">
+                                Project List
+                            </h2>
                             <p className="text-sm text-muted-foreground">
                                 List utama untuk edit dan delete project.
                             </p>
@@ -463,7 +494,9 @@ export default function Dashboard() {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => openEditProject(project)}
+                                            onClick={() =>
+                                                openEditProject(project)
+                                            }
                                         >
                                             <Pencil className="size-4" />
                                             Edit
@@ -494,14 +527,20 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            <Dialog open={techstackDialogOpen} onOpenChange={setTechstackDialogOpen}>
+            <Dialog
+                open={techstackDialogOpen}
+                onOpenChange={setTechstackDialogOpen}
+            >
                 <DialogContent className="sm:max-w-lg">
                     <DialogHeader>
                         <DialogTitle>
-                            {editingTechstackId ? 'Update techstack' : 'Create techstack'}
+                            {editingTechstackId
+                                ? 'Update techstack'
+                                : 'Create techstack'}
                         </DialogTitle>
                         <DialogDescription>
-                            Kelola data techstack yang bisa dipilih pada project.
+                            Kelola data techstack yang bisa dipilih pada
+                            project.
                         </DialogDescription>
                     </DialogHeader>
 
@@ -512,7 +551,10 @@ export default function Dashboard() {
                                 id="techstack-name"
                                 value={techstackForm.data.name}
                                 onChange={(e) =>
-                                    techstackForm.setData('name', e.target.value)
+                                    techstackForm.setData(
+                                        'name',
+                                        e.target.value,
+                                    )
                                 }
                             />
                             {techstackForm.errors.name && (
@@ -528,7 +570,10 @@ export default function Dashboard() {
                                 id="techstack-icon"
                                 value={techstackForm.data.icon}
                                 onChange={(e) =>
-                                    techstackForm.setData('icon', e.target.value)
+                                    techstackForm.setData(
+                                        'icon',
+                                        e.target.value,
+                                    )
                                 }
                             />
                             {techstackForm.errors.icon && (
@@ -556,11 +601,16 @@ export default function Dashboard() {
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
+            <Dialog
+                open={categoryDialogOpen}
+                onOpenChange={setCategoryDialogOpen}
+            >
                 <DialogContent className="sm:max-w-lg">
                     <DialogHeader>
                         <DialogTitle>
-                            {editingCategoryId ? 'Update category' : 'Create category'}
+                            {editingCategoryId
+                                ? 'Update category'
+                                : 'Create category'}
                         </DialogTitle>
                         <DialogDescription>
                             Kelola kategori untuk klasifikasi project.
@@ -590,7 +640,10 @@ export default function Dashboard() {
                                 id="category-color"
                                 value={categoryForm.data.color}
                                 onChange={(e) =>
-                                    categoryForm.setData('color', e.target.value)
+                                    categoryForm.setData(
+                                        'color',
+                                        e.target.value,
+                                    )
                                 }
                             />
                             {categoryForm.errors.color && (
@@ -618,14 +671,20 @@ export default function Dashboard() {
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={projectDialogOpen} onOpenChange={setProjectDialogOpen}>
+            <Dialog
+                open={projectDialogOpen}
+                onOpenChange={setProjectDialogOpen}
+            >
                 <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
                     <DialogHeader>
                         <DialogTitle>
-                            {editingProjectId ? 'Update project' : 'Create project'}
+                            {editingProjectId
+                                ? 'Update project'
+                                : 'Create project'}
                         </DialogTitle>
                         <DialogDescription>
-                            Kelola seluruh field project beserta category dan techstack.
+                            Kelola seluruh field project beserta category dan
+                            techstack.
                         </DialogDescription>
                     </DialogHeader>
 
@@ -660,7 +719,9 @@ export default function Dashboard() {
                         <div className="grid gap-2">
                             <Label>Category</Label>
                             <Select
-                                value={projectForm.data.category_id || '__none__'}
+                                value={
+                                    projectForm.data.category_id || '__none__'
+                                }
                                 onValueChange={(value) =>
                                     projectForm.setData(
                                         'category_id',
@@ -672,7 +733,9 @@ export default function Dashboard() {
                                     <SelectValue placeholder="Select category" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="__none__">No category</SelectItem>
+                                    <SelectItem value="__none__">
+                                        No category
+                                    </SelectItem>
                                     {categories.map((category) => (
                                         <SelectItem
                                             key={category.id}
@@ -715,43 +778,69 @@ export default function Dashboard() {
                                 id="project-demo-link"
                                 value={projectForm.data.demo_link}
                                 onChange={(e) =>
-                                    projectForm.setData('demo_link', e.target.value)
+                                    projectForm.setData(
+                                        'demo_link',
+                                        e.target.value,
+                                    )
                                 }
                             />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="project-github-link">Github link</Label>
+                            <Label htmlFor="project-github-link">
+                                Github link
+                            </Label>
                             <Input
                                 id="project-github-link"
                                 value={projectForm.data.github_link}
                                 onChange={(e) =>
-                                    projectForm.setData('github_link', e.target.value)
+                                    projectForm.setData(
+                                        'github_link',
+                                        e.target.value,
+                                    )
                                 }
                             />
                         </div>
 
                         <div className="grid gap-2 md:col-span-2">
-                            <Label htmlFor="project-video-link">Video link</Label>
+                            <Label htmlFor="project-video-link">
+                                Video link
+                            </Label>
                             <Input
                                 id="project-video-link"
                                 value={projectForm.data.video_link}
                                 onChange={(e) =>
-                                    projectForm.setData('video_link', e.target.value)
+                                    projectForm.setData(
+                                        'video_link',
+                                        e.target.value,
+                                    )
                                 }
                             />
                         </div>
 
                         <div className="grid gap-2 md:col-span-2">
-                            <Label htmlFor="project-description">Description</Label>
+                            <Label htmlFor="project-description">
+                                Description
+                            </Label>
                             <textarea
                                 id="project-description"
                                 value={projectForm.data.description}
                                 onChange={(e) =>
-                                    projectForm.setData('description', e.target.value)
+                                    projectForm.setData(
+                                        'description',
+                                        e.target.value,
+                                    )
                                 }
                                 rows={6}
                                 className="min-h-32 rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                            />
+                            <RichTextEditor
+                                id="project-description-editor"
+                                value={projectForm.data.description || ''}
+                                onChange={(value) =>
+                                    projectForm.setData('description', value)
+                                }
+                                placeholder="Write the project description in rich text..."
                             />
                         </div>
 
@@ -801,7 +890,10 @@ export default function Dashboard() {
                     </DialogHeader>
 
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setDeleteState(null)}>
+                        <Button
+                            variant="outline"
+                            onClick={() => setDeleteState(null)}
+                        >
                             Cancel
                         </Button>
                         <Button variant="destructive" onClick={confirmDelete}>

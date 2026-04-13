@@ -166,3 +166,113 @@
         @apply bg-background text-foreground;
     }
 }
+
+@layer components {
+    .project-description-editor .ql-toolbar {
+        @apply rounded-t-md border-input bg-muted/40;
+    }
+
+    .project-description-editor .ql-container {
+        @apply min-h-40 rounded-b-md border-input bg-transparent text-sm;
+    }
+
+    .project-description-editor .ql-editor {
+        @apply min-h-40 text-sm text-foreground;
+    }
+
+    .project-description-editor .ql-editor.ql-blank::before {
+        color: color-mix(
+            in oklab,
+            var(--color-muted-foreground) 85%,
+            transparent
+        );
+        font-style: normal;
+    }
+
+    .project-description-editor .ql-snow .ql-stroke {
+        stroke: var(--color-foreground);
+    }
+
+    .project-description-editor .ql-snow .ql-fill {
+        fill: var(--color-foreground);
+    }
+
+    .project-description-editor .ql-snow .ql-picker {
+        color: var(--color-foreground);
+    }
+
+    .project-description-editor .ql-snow.ql-toolbar button:hover,
+    .project-description-editor .ql-snow .ql-toolbar button:hover,
+    .project-description-editor .ql-snow.ql-toolbar button.ql-active,
+    .project-description-editor .ql-snow .ql-toolbar button.ql-active,
+    .project-description-editor .ql-snow.ql-toolbar .ql-picker-label:hover,
+    .project-description-editor .ql-snow .ql-toolbar .ql-picker-label:hover,
+    .project-description-editor .ql-snow.ql-toolbar .ql-picker-label.ql-active,
+    .project-description-editor .ql-snow .ql-toolbar .ql-picker-label.ql-active,
+    .project-description-editor .ql-snow.ql-toolbar .ql-picker-item:hover,
+    .project-description-editor .ql-snow .ql-toolbar .ql-picker-item:hover,
+    .project-description-editor
+        .ql-snow
+        .ql-toolbar
+        .ql-picker-item.ql-selected {
+        color: var(--color-primary);
+    }
+
+    .project-description-editor .ql-snow.ql-toolbar button:hover .ql-stroke,
+    .project-description-editor .ql-snow .ql-toolbar button:hover .ql-stroke,
+    .project-description-editor .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+    .project-description-editor
+        .ql-snow
+        .ql-toolbar
+        button.ql-active
+        .ql-stroke,
+    .project-description-editor
+        .ql-snow.ql-toolbar
+        .ql-picker-label:hover
+        .ql-stroke,
+    .project-description-editor
+        .ql-snow
+        .ql-toolbar
+        .ql-picker-label:hover
+        .ql-stroke,
+    .project-description-editor
+        .ql-snow.ql-toolbar
+        .ql-picker-label.ql-active
+        .ql-stroke,
+    .project-description-editor
+        .ql-snow
+        .ql-toolbar
+        .ql-picker-label.ql-active
+        .ql-stroke {
+        stroke: var(--color-primary);
+    }
+
+    .project-description-editor .ql-snow.ql-toolbar button:hover .ql-fill,
+    .project-description-editor .ql-snow .ql-toolbar button:hover .ql-fill,
+    .project-description-editor .ql-snow.ql-toolbar button.ql-active .ql-fill,
+    .project-description-editor .ql-snow .ql-toolbar button.ql-active .ql-fill,
+    .project-description-editor
+        .ql-snow.ql-toolbar
+        .ql-picker-label:hover
+        .ql-fill,
+    .project-description-editor
+        .ql-snow
+        .ql-toolbar
+        .ql-picker-label:hover
+        .ql-fill,
+    .project-description-editor
+        .ql-snow.ql-toolbar
+        .ql-picker-label.ql-active
+        .ql-fill,
+    .project-description-editor
+        .ql-snow
+        .ql-toolbar
+        .ql-picker-label.ql-active
+        .ql-fill {
+        fill: var(--color-primary);
+    }
+
+    .project-description-editor .ql-snow .ql-picker-options {
+        @apply border-input bg-popover text-popover-foreground;
+    }
+}

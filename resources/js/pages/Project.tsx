@@ -44,6 +44,16 @@ export default function Project({ project }: Props) {
               'https://www.youtube.com/embed/',
           )
         : null;
+    const videoEmbed = videoLink ? (
+        <iframe
+            className="aspect-video h-full w-full rounded-3xl"
+            src={videoLink}
+            title="YouTube video player"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+        />
+    ) : null;
 
     return (
         <>
@@ -55,7 +65,7 @@ export default function Project({ project }: Props) {
                 <div className="mt-10 pt-8 pb-16 lg:pt-16 lg:pb-24">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start xl:gap-14">
-                            <main className="mx-auto w-full max-w-3xl">
+                            <main className="min-w-0 w-full max-w-3xl">
                                 <a
                                     href="/projects"
                                     className="text-xs font-medium text-blue-500 hover:underline"
@@ -71,30 +81,16 @@ export default function Project({ project }: Props) {
                                         {title}
                                     </h1>
                                 </header>
-                                {videoLink ? (
-                                    <iframe
-                                        className="aspect-video h-full w-full rounded-3xl"
-                                        src={videoLink}
-                                        title="YouTube video player"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                        referrerPolicy="strict-origin-when-cross-origin"
-                                        allowFullScreen
-                                    />
-                                ) : (
-                                    <iframe
-                                        className="hidden h-full w-full"
-                                        src=""
-                                        title="YouTube video player"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                        referrerPolicy="strict-origin-when-cross-origin"
-                                        allowFullScreen
-                                    />
+                                {videoEmbed && (
+                                    <div className="mb-8 hidden lg:block">
+                                        {videoEmbed}
+                                    </div>
                                 )}
 
-                                <article className="pt-5 text-base leading-8 text-white/70">
+                                <article className="min-w-0 break-words pt-5 text-base leading-8 text-white/70">
                                     {description ? (
                                         <div
-                                            className="font-mono [&_.ql-align-center]:text-center [&_.ql-align-justify]:text-justify [&_.ql-align-right]:text-right [&_.ql-indent-1]:pl-6 [&_.ql-indent-2]:pl-12 [&_.ql-indent-3]:pl-18 [&_a]:font-medium [&_a]:text-blue-400 [&_a]:underline [&_a]:decoration-blue-400/40 [&_a]:underline-offset-4 [&_blockquote]:my-8 [&_blockquote]:border-l-4 [&_blockquote]:border-white/15 [&_blockquote]:pl-5 [&_blockquote]:text-white/60 [&_blockquote]:italic [&_code]:rounded-md [&_code]:bg-white/8 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm [&_em]:italic [&_h1]:mt-10 [&_h1]:mb-4 [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:font-extrabold [&_h1]:text-white [&_h2]:mt-9 [&_h2]:mb-4 [&_h2]:text-3xl [&_h2]:leading-tight [&_h2]:font-bold [&_h2]:text-white [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:text-white [&_img]:my-8 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-3xl [&_img]:border [&_img]:border-white/10 [&_img]:shadow-lg [&_li]:text-white/70 [&_ol]:my-6 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_p]:my-5 [&_p]:text-base [&_p]:leading-8 [&_p]:text-white/70 [&_pre]:my-8 [&_pre]:overflow-x-auto [&_pre]:rounded-2xl [&_pre]:border [&_pre]:border-white/10 [&_pre]:bg-black/30 [&_pre]:p-4 [&_pre]:text-sm [&_strong]:font-semibold [&_strong]:text-white [&_ul]:my-6 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6"
+                                            className="min-w-0 break-words font-mono [&_.ql-align-center]:text-center [&_.ql-align-justify]:text-justify [&_.ql-align-right]:text-right [&_.ql-indent-1]:pl-6 [&_.ql-indent-2]:pl-12 [&_.ql-indent-3]:pl-18 [&_a]:break-words [&_a]:font-medium [&_a]:text-blue-400 [&_a]:underline [&_a]:decoration-blue-400/40 [&_a]:underline-offset-4 [&_blockquote]:my-8 [&_blockquote]:overflow-wrap-anywhere [&_blockquote]:border-l-4 [&_blockquote]:border-white/15 [&_blockquote]:pl-5 [&_blockquote]:text-white/60 [&_blockquote]:italic [&_code]:break-words [&_code]:rounded-md [&_code]:bg-white/8 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm [&_em]:italic [&_h1]:mt-10 [&_h1]:mb-4 [&_h1]:overflow-wrap-anywhere [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:font-extrabold [&_h1]:text-white [&_h2]:mt-9 [&_h2]:mb-4 [&_h2]:overflow-wrap-anywhere [&_h2]:text-3xl [&_h2]:leading-tight [&_h2]:font-bold [&_h2]:text-white [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:overflow-wrap-anywhere [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:text-white [&_img]:my-8 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-3xl [&_img]:border [&_img]:border-white/10 [&_img]:shadow-lg [&_li]:overflow-wrap-anywhere [&_li]:text-white/70 [&_ol]:my-6 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_p]:my-5 [&_p]:overflow-wrap-anywhere [&_p]:text-base [&_p]:leading-8 [&_p]:text-white/70 [&_pre]:my-8 [&_pre]:overflow-x-auto [&_pre]:rounded-2xl [&_pre]:border [&_pre]:border-white/10 [&_pre]:bg-black/30 [&_pre]:p-4 [&_pre]:text-sm [&_strong]:font-semibold [&_strong]:text-white [&_ul]:my-6 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6"
                                             dangerouslySetInnerHTML={{
                                                 __html: description,
                                             }}
@@ -105,6 +101,12 @@ export default function Project({ project }: Props) {
                                         </p>
                                     )}
                                 </article>
+
+                                {videoEmbed && (
+                                    <div className="mt-8 lg:hidden">
+                                        {videoEmbed}
+                                    </div>
+                                )}
                             </main>
 
                             <aside className="w-full lg:sticky lg:top-28">

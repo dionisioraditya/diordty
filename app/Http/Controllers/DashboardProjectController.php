@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Support\ProjectDescriptionSanitizer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -58,6 +59,9 @@ class DashboardProjectController extends Controller
             'techstack_ids.*' => ['integer', 'exists:techstacks,id'],
         ]);
 
+        $data['description'] = ProjectDescriptionSanitizer::sanitize(
+            $data['description'] ?? null,
+        );
         $data['slug'] = $this->generateUniqueSlug($data['title'], $project?->id);
 
         return $data;

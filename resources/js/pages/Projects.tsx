@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { motion } from 'framer-motion';
 import Navbar from '@/components/mycomponents/Navbar';
 import PostsCard from '@/components/mycomponents/PostsCard';
 import SearchBar from '@/components/mycomponents/Searchbar';
@@ -45,17 +46,33 @@ export default function Projects({ projects, categories, filters }: Props) {
                 <Navbar />
 
                 <div className="pt-25">
-                    <SearchBar
-                        categories={categories}
-                        search={filters.search}
-                        category={filters.category}
-                    />
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 2.0 }}
+                    >
+                        <SearchBar
+                            categories={categories}
+                            search={filters.search}
+                            category={filters.category}
+                        />
+                    </motion.div>
+
                     {projects.data.length > 0 ? (
-                        <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 px-4 pt-10 sm:grid-cols-2 lg:grid-cols-3">
-                            {projects.data.map((project) => (
-                                <PostsCard key={project.id} project={project} />
-                            ))}
-                        </div>
+                        <motion.div
+                            initial={{ opacity: 0, y: -100 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 1.0 }}
+                        >
+                            <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 px-4 pt-10 sm:grid-cols-2 lg:grid-cols-3">
+                                {projects.data.map((project) => (
+                                    <PostsCard
+                                        key={project.id}
+                                        project={project}
+                                    />
+                                ))}
+                            </div>
+                        </motion.div>
                     ) : (
                         <div className="mx-auto max-w-7xl px-4 pt-10">
                             <div className="rounded-base border-default bg-neutral-primary-soft p-8 text-center">
@@ -69,7 +86,7 @@ export default function Projects({ projects, categories, filters }: Props) {
                             </div>
                         </div>
                     )}
-                    <div className="mt-8 flex items-center justify-center gap-4">
+                    <div className="mt-8 flex items-center justify-center gap-4 pb-5">
                         {projects.prev_page_url && (
                             <Link
                                 href={projects.prev_page_url}
