@@ -72,6 +72,25 @@ const emptyProjectForm = {
     techstack_ids: [] as string[],
 };
 
+const IMAGE_MAX_SIZE_BYTES = 50 * 1024 * 1024;
+const IMAGE_ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
+
+function normalizeStoredImagePath(image?: string | null) {
+    if (!image) return null;
+    if (image.startsWith('http://') || image.startsWith('https://')) return image;
+    if (image.startsWith('/')) return image;
+
+    return `/storage/${image}`;
+}
+
+function getCsrfToken() {
+    return (
+        document
+            .querySelector<HTMLMetaElement>('meta[name="csrf-token"]')
+            ?.getAttribute('content') ?? ''
+    );
+}
+
 function DashboardPanel({
     title,
     description,
@@ -155,6 +174,19 @@ export default function Dashboard() {
     const [editingProjectId, setEditingProjectId] = useState<number | null>(
         null,
     );
+    const [projectImagePreviewUrl, setProjectImagePreviewUrl] = useState<
+        string | null
+    >(null);
+    const [projectExistingImageUrl, setProjectExistingImageUrl] = useState<
+        string | null
+    >(null);
+    const [projectImageTempPath, setProjectImageTempPath] = useState<
+        string | null
+    >(null);
+    const [projectImageUploading, setProjectImageUploading] = useState(false);
+    const [projectImageError, setProjectImageError] = useState<string | null>(
+        null,
+    );
 
     const techstackForm = useForm(emptyTechstackForm);
     const categoryForm = useForm(emptyCategoryForm);
@@ -173,6 +205,72 @@ export default function Dashboard() {
     useEffect(() => {
         if (!projectDialogOpen) projectForm.clearErrors();
     }, [projectDialogOpen]);
+
+    useEffect(() => {
+        return () => {
+            if (
+                projectImagePreviewUrl &&
+                projectImagePreviewUrl.startsWith('blob:')
+            ) {
+                URL.revokeObjectURL(projectImagePreviewUrl);
+            }
+        };
+    }, [projectImagePreviewUrl]);
+
+    const cleanupTempImage = async (path: string | null) => {
+        if (!path) return;
+
+        try {
+            await fetch('/dashboard/projects/upload-temp-image', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({ path }),
+                credentials: 'same-origin',
+            });
+        } catch {
+            // Best-effort cleanup; failure should not block UI flow.
+        }
+    };
+
+    const resetProjectImageState = (options?: {
+        preserveExisting?: boolean;
+        preserveTemp?: boolean;
+    }) => {
+        if (
+            projectImagePreviewUrl &&
+            projectImagePreviewUrl.startsWith('blob:')
+        ) {
+            URL.revokeObjectURL(projectImagePreviewUrl);
+        }
+
+        setProjectImagePreviewUrl(null);
+        setProjectImageError(null);
+        setProjectImageUploading(false);
+
+        if (!options?.preserveExisting) {
+            setProjectExistingImageUrl(null);
+        }
+
+        if (!options?.preserveTemp) {
+            setProjectImageTempPath(null);
+        }
+    };
+
+    const closeProjectDialog = async () => {
+        if (projectImageTempPath) {
+            await cleanupTempImage(projectImageTempPath);
+        }
+
+        resetProjectImageState();
+        projectForm.reset();
+        projectForm.setData(emptyProjectForm);
+        setEditingProjectId(null);
+        setProjectDialogOpen(false);
+    };
 
     const openCreateTechstack = () => {
         setEditingTechstackId(null);
@@ -210,6 +308,7 @@ export default function Dashboard() {
         setEditingProjectId(null);
         projectForm.reset();
         projectForm.setData(emptyProjectForm);
+        resetProjectImageState();
         setProjectDialogOpen(true);
     };
 
@@ -217,7 +316,7 @@ export default function Dashboard() {
         setEditingProjectId(project.id);
         projectForm.setData({
             title: project.title,
-            image: project.image ?? '',
+            image: '',
             description: project.description ?? '',
             demo_link: project.demo_link ?? '',
             github_link: project.github_link ?? '',
@@ -227,6 +326,8 @@ export default function Dashboard() {
             techstack_ids:
                 project.techstacks?.map((item) => String(item.id)) ?? [],
         });
+        resetProjectImageState({ preserveExisting: true });
+        setProjectExistingImageUrl(normalizeStoredImagePath(project.image));
         setProjectDialogOpen(true);
     };
 
@@ -275,12 +376,99 @@ export default function Dashboard() {
         action(url, {
             preserveScroll: true,
             onSuccess: () => {
+                resetProjectImageState();
                 setProjectDialogOpen(false);
                 setEditingProjectId(null);
                 projectForm.reset();
+                projectForm.setData(emptyProjectForm);
             },
         });
     };
+
+    const handleProjectImageSelection = async (
+        event: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+        const file = event.target.files?.[0];
+
+        if (!file) {
+            return;
+        }
+
+        setProjectImageError(null);
+
+        if (!IMAGE_ACCEPTED_TYPES.includes(file.type)) {
+            setProjectImageError(
+                'Image must be in PNG, JPG, or JPEG format.',
+            );
+            event.target.value = '';
+            return;
+        }
+
+        if (file.size > IMAGE_MAX_SIZE_BYTES) {
+            setProjectImageError('Image size must not exceed 50MB.');
+            event.target.value = '';
+            return;
+        }
+
+        if (projectImageTempPath) {
+            await cleanupTempImage(projectImageTempPath);
+        }
+
+        if (
+            projectImagePreviewUrl &&
+            projectImagePreviewUrl.startsWith('blob:')
+        ) {
+            URL.revokeObjectURL(projectImagePreviewUrl);
+        }
+
+        const previewUrl = URL.createObjectURL(file);
+        setProjectImagePreviewUrl(previewUrl);
+        setProjectImageUploading(true);
+
+        try {
+            const formData = new FormData();
+            formData.append('image_file', file);
+
+            const response = await fetch('/dashboard/projects/upload-temp-image', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    Accept: 'application/json',
+                },
+                body: formData,
+                credentials: 'same-origin',
+            });
+
+            const payload = await response.json();
+
+            if (!response.ok) {
+                const serverError =
+                    payload?.errors?.image_file?.[0] ??
+                    payload?.message ??
+                    'Image upload failed.';
+                throw new Error(serverError);
+            }
+
+            setProjectImageTempPath(payload.path);
+            projectForm.setData('image', payload.path);
+        } catch (error) {
+            projectForm.setData('image', '');
+            setProjectImageTempPath(null);
+            setProjectImagePreviewUrl(null);
+            setProjectImageError(
+                error instanceof Error ? error.message : 'Image upload failed.',
+            );
+
+            if (previewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(previewUrl);
+            }
+        } finally {
+            setProjectImageUploading(false);
+            event.target.value = '';
+        }
+    };
+
+    const currentProjectImagePreview = projectImagePreviewUrl || projectExistingImageUrl;
 
     const confirmDelete = () => {
         if (!deleteState) return;
@@ -673,7 +861,14 @@ export default function Dashboard() {
 
             <Dialog
                 open={projectDialogOpen}
-                onOpenChange={setProjectDialogOpen}
+                onOpenChange={(open) => {
+                    if (open) {
+                        setProjectDialogOpen(true);
+                        return;
+                    }
+
+                    void closeProjectDialog();
+                }}
             >
                 <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
                     <DialogHeader>
@@ -709,11 +904,40 @@ export default function Dashboard() {
                             <Label htmlFor="project-image">Image</Label>
                             <Input
                                 id="project-image"
-                                value={projectForm.data.image}
+                                type="file"
+                                accept=".png,.jpg,.jpeg,image/png,image/jpeg"
                                 onChange={(e) =>
-                                    projectForm.setData('image', e.target.value)
+                                    void handleProjectImageSelection(e)
                                 }
                             />
+                            <p className="text-xs text-muted-foreground">
+                                PNG, JPG, JPEG up to 50MB. Image is uploaded to
+                                temporary storage first, then moved when you
+                                create or update the project.
+                            </p>
+                            <div className="overflow-hidden rounded-xl border border-dashed border-input bg-muted/20">
+                                {currentProjectImagePreview ? (
+                                    <img
+                                        src={currentProjectImagePreview}
+                                        alt="Project preview"
+                                        className="h-56 w-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-56 items-center justify-center px-4 text-center text-sm text-muted-foreground">
+                                        Image preview will appear here.
+                                    </div>
+                                )}
+                            </div>
+                            {projectImageUploading && (
+                                <p className="text-sm text-muted-foreground">
+                                    Uploading image...
+                                </p>
+                            )}
+                            {(projectImageError || projectForm.errors.image) && (
+                                <p className="text-sm text-destructive">
+                                    {projectImageError ?? projectForm.errors.image}
+                                </p>
+                            )}
                         </div>
 
                         <div className="grid gap-2">
@@ -861,13 +1085,13 @@ export default function Dashboard() {
                     <DialogFooter>
                         <Button
                             variant="outline"
-                            onClick={() => setProjectDialogOpen(false)}
+                            onClick={() => void closeProjectDialog()}
                         >
                             Cancel
                         </Button>
                         <Button
                             onClick={submitProject}
-                            disabled={projectForm.processing}
+                            disabled={projectForm.processing || projectImageUploading}
                         >
                             {editingProjectId ? 'Update' : 'Create'}
                         </Button>

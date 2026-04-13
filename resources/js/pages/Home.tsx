@@ -58,7 +58,9 @@ export default function Home({ categories, techstack }: Props) {
                         }}
                         className="py-24 lg:flex lg:min-h-screen lg:items-center"
                     >
-                        <TechstackRotation techstack={techstack} />
+                        <div className="w-full">
+                            <TechstackRotation techstack={techstack} />
+                        </div>
                     </motion.section>
                 </div>
 

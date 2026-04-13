@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Support\ProjectDescriptionSanitizer;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class DashboardProjectController extends Controller
 {
@@ -15,6 +18,7 @@ class DashboardProjectController extends Controller
         $data = $this->validateProject($request);
         $techstackIds = $data['techstack_ids'] ?? [];
         unset($data['techstack_ids']);
+        $data['image'] = $this->moveTempImageToFinal($data['image'] ?? null);
 
         $project = Project::create($data);
         $project->techstacks()->sync($techstackIds);
@@ -27,6 +31,22 @@ class DashboardProjectController extends Controller
         $data = $this->validateProject($request, $project);
         $techstackIds = $data['techstack_ids'] ?? [];
         unset($data['techstack_ids']);
+        $nextImage = $data['image'] ?? null;
+        $currentImage = $project->image;
+
+        if ($nextImage !== null) {
+            $data['image'] = $this->moveTempImageToFinal($nextImage);
+
+            if (
+                $currentImage !== null &&
+                $currentImage !== '' &&
+                $currentImage !== $data['image']
+            ) {
+                $this->deleteStoredImage($currentImage);
+            }
+        } else {
+            unset($data['image']);
+        }
 
         $project->update($data);
         $project->techstacks()->sync($techstackIds);
@@ -34,8 +54,42 @@ class DashboardProjectController extends Controller
         return back();
     }
 
+    public function uploadTempImage(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'image_file' => ['required', 'file', 'mimes:png,jpg,jpeg', 'max:51200'],
+        ]);
+
+        $path = $validated['image_file']->store('temp', 'public');
+
+        return response()->json([
+            'path' => $path,
+            'url' => Storage::disk('public')->url($path),
+            'original_name' => $validated['image_file']->getClientOriginalName(),
+        ]);
+    }
+
+    public function deleteTempImage(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'path' => ['required', 'string'],
+        ]);
+
+        $path = $validated['path'];
+
+        if ($this->isTempPath($path) && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
+
+        return response()->json(['deleted' => true]);
+    }
+
     public function destroy(Project $project): RedirectResponse
     {
+        if ($project->image) {
+            $this->deleteStoredImage($project->image);
+        }
+
         $project->delete();
 
         return back();
@@ -62,9 +116,64 @@ class DashboardProjectController extends Controller
         $data['description'] = ProjectDescriptionSanitizer::sanitize(
             $data['description'] ?? null,
         );
+
+        if (($data['image'] ?? null) !== null && $data['image'] !== '') {
+            if (!$this->isTempPath($data['image'])) {
+                throw ValidationException::withMessages([
+                    'image' => 'Uploaded image reference is invalid.',
+                ]);
+            }
+
+            if (!Storage::disk('public')->exists($data['image'])) {
+                throw ValidationException::withMessages([
+                    'image' => 'Uploaded image could not be found in temporary storage.',
+                ]);
+            }
+        } else {
+            $data['image'] = null;
+        }
+
         $data['slug'] = $this->generateUniqueSlug($data['title'], $project?->id);
 
         return $data;
+    }
+
+    private function moveTempImageToFinal(?string $tempPath): ?string
+    {
+        if ($tempPath === null || $tempPath === '') {
+            return null;
+        }
+
+        if (!$this->isTempPath($tempPath)) {
+            throw ValidationException::withMessages([
+                'image' => 'Uploaded image reference is invalid.',
+            ]);
+        }
+
+        if (!Storage::disk('public')->exists($tempPath)) {
+            throw ValidationException::withMessages([
+                'image' => 'Uploaded image could not be found in temporary storage.',
+            ]);
+        }
+
+        $extension = pathinfo($tempPath, PATHINFO_EXTENSION);
+        $finalPath = sprintf('img/%s.%s', (string) Str::uuid(), $extension);
+
+        Storage::disk('public')->move($tempPath, $finalPath);
+
+        return $finalPath;
+    }
+
+    private function isTempPath(string $path): bool
+    {
+        return str_starts_with($path, 'temp/');
+    }
+
+    private function deleteStoredImage(string $path): void
+    {
+        if (Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
     }
 
     private function generateUniqueSlug(string $title, ?int $ignoreId = null): string

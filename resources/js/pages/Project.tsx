@@ -35,7 +35,7 @@ function normalizeImagePath(image?: string | null) {
 export default function Project({ project }: Props) {
     const title = project.title?.trim() || 'Untitled project';
     const description = project.description?.trim();
-    const imageSrc = project.image;
+    const imageSrc = normalizeImagePath(project.image);
     const hasLinks = Boolean(project.github_link || project.video_link);
     const techstacks = project.techstacks ?? [];
     const videoLink = project.video_link

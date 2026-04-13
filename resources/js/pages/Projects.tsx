@@ -16,6 +16,7 @@ type Project = {
     slug: string;
     category: Category;
     description: string;
+    image?: string | null;
 };
 
 type PaginatedProjects = {

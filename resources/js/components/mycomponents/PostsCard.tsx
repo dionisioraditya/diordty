@@ -14,6 +14,7 @@ type Project = {
     slug: string;
     category: Category;
     description: string;
+    image?: string | null;
 };
 
 type Props = {
@@ -51,7 +52,7 @@ export default function PostsCard({ project }: Props) {
                     <div className="relative overflow-hidden">
                         <img
                             className="h-50 w-full object-cover"
-                            src="wallpaper.jpg"
+                            src={project.image || '/images/default-project.png'}
                             alt=""
                         />
                         <a

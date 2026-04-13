@@ -30,6 +30,8 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::delete('dashboard/categories/{category}', [DashboardCategoryController::class, 'destroy'])->name('dashboard.categories.destroy');
 
     Route::post('dashboard/projects', [DashboardProjectController::class, 'store'])->name('dashboard.projects.store');
+    Route::post('dashboard/projects/upload-temp-image', [DashboardProjectController::class, 'uploadTempImage'])->name('dashboard.projects.upload-temp-image');
+    Route::delete('dashboard/projects/upload-temp-image', [DashboardProjectController::class, 'deleteTempImage'])->name('dashboard.projects.delete-temp-image');
     Route::patch('dashboard/projects/{project}', [DashboardProjectController::class, 'update'])->name('dashboard.projects.update');
     Route::delete('dashboard/projects/{project}', [DashboardProjectController::class, 'destroy'])->name('dashboard.projects.destroy');
 });
