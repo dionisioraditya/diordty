@@ -10,13 +10,13 @@ export default function Hero() {
                 status="Online"
                 contactText="Contact Me"
                 avatarUrl="myprofile.png"
-                showUserInfo={false}
+                showUserInfo={true}
                 enableTilt={true}
                 enableMobileTilt={true}
                 onContactClick={() => console.log('Contact clicked')}
-                behindGlowColor="rgba(125, 190, 255, 0.67)"
+                behindGlowColor="rgba(8, 8, 74, 1)"
                 iconUrl="/assets/demo/iconpattern.png"
-                behindGlowEnabled
+                behindGlowEnabled={false}
                 innerGradient="linear-gradient(145deg,#60496e8c 0%,#71C4FF44 100%)"
             />
         </div>

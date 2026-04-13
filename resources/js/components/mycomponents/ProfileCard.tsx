@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 
 const DEFAULT_INNER_GRADIENT =
-    'linear-gradient(145deg,#60496e8c 0%,#71C4FF44 100%)';
+    'linear-gradient(145deg, transparent 0%, transparent 100%)';
 
 const ANIMATION_CONFIG = {
     INITIAL_DURATION: 1200,
@@ -427,72 +427,6 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
         onContactClick?.();
     }, [onContactClick]);
 
-    // Complex styles that require CSS variables and can't be done with Tailwind
-    const shineStyle = {
-        maskImage: 'var(--icon)',
-        maskMode: 'luminance',
-        maskRepeat: 'repeat',
-        maskSize: '150%',
-        maskPosition:
-            'top calc(200% - (var(--background-y) * 5)) left calc(100% - var(--background-x))',
-        filter: 'brightness(0.66) contrast(1.33) saturate(0.33) opacity(0.5)',
-        animation: 'pc-holo-bg 18s linear infinite',
-        animationPlayState: 'running' as const,
-        mixBlendMode: 'color-dodge' as const,
-        transform: 'translate3d(0, 0, 1px)',
-        overflow: 'hidden' as const,
-        zIndex: 3,
-        background: 'transparent',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundImage: `
-      repeating-linear-gradient(
-        0deg,
-        var(--sunpillar-clr-1) 5%,
-        var(--sunpillar-clr-2) 10%,
-        var(--sunpillar-clr-3) 15%,
-        var(--sunpillar-clr-4) 20%,
-        var(--sunpillar-clr-5) 25%,
-        var(--sunpillar-clr-6) 30%,
-        var(--sunpillar-clr-1) 35%
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        #0e152e 0%,
-        hsl(180, 10%, 60%) 3.8%,
-        hsl(180, 29%, 66%) 4.5%,
-        hsl(180, 10%, 60%) 5.2%,
-        #0e152e 10%,
-        #0e152e 12%
-      ),
-      radial-gradient(
-        farthest-corner circle at var(--pointer-x) var(--pointer-y),
-        hsla(0, 0%, 0%, 0.1) 12%,
-        hsla(0, 0%, 0%, 0.15) 20%,
-        hsla(0, 0%, 0%, 0.25) 120%
-      )
-    `.replace(/\s+/g, ' '),
-        gridArea: '1 / -1',
-        borderRadius: cardRadius,
-        pointerEvents: 'none' as const,
-    };
-
-    const glareStyle: React.CSSProperties = {
-        transform: 'translate3d(0, 0, 1.1px)',
-        overflow: 'hidden',
-        backgroundImage: `radial-gradient(
-      farthest-corner circle at var(--pointer-x) var(--pointer-y),
-      hsl(248, 25%, 80%) 12%,
-      hsla(207, 40%, 30%, 0.8) 90%
-    )`,
-        mixBlendMode: 'overlay',
-        filter: 'brightness(0.8) contrast(1.2)',
-        zIndex: 4,
-        gridArea: '1 / -1',
-        borderRadius: cardRadius,
-        pointerEvents: 'none',
-    };
-
     return (
         <div
             ref={wrapRef}
@@ -529,7 +463,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                             'rgba(0, 0, 0, 0.8) calc((var(--pointer-from-left) * 10px) - 3px) calc((var(--pointer-from-top) * 20px) - 6px) 20px -5px',
                         transition: 'transform 1s ease',
                         transform: 'translateZ(0) rotateX(0deg) rotateY(0deg)',
-                        background: 'rgba(0, 0, 0, 0.9)',
+                        background: 'rgba(10,14,25,0.55)',
                         backfaceVisibility: 'hidden',
                     }}
                     onMouseEnter={(e) => {
@@ -553,24 +487,18 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                     <div
                         className="absolute inset-0"
                         style={{
-                            backgroundImage: 'var(--inner-gradient)',
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            // backgroundImage: 'var(--inner-gradient)',
+                            backgroundColor: 'rgba(4, 10, 19, 1)',
                             borderRadius: cardRadius,
                             display: 'grid',
                             gridArea: '1 / -1',
                         }}
                     >
-                        {/* Shine layer */}
-                        <div style={shineStyle} />
-
-                        {/* Glare layer */}
-                        <div style={glareStyle} />
-
                         {/* Avatar content */}
                         <div
                             className="overflow-visible"
                             style={{
-                                mixBlendMode: 'luminosity',
+                                mixBlendMode: 'normal',
                                 transform: 'translateZ(2px)',
                                 gridArea: '1 / -1',
                                 borderRadius: cardRadius,
@@ -673,7 +601,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                             style={{
                                 transform:
                                     'translate3d(calc(var(--pointer-from-left) * -6px + 3px), calc(var(--pointer-from-top) * -6px + 3px), 0.1px)',
-                                mixBlendMode: 'luminosity',
+                                mixBlendMode: 'normal',
                                 gridArea: '1 / -1',
                                 borderRadius: cardRadius,
                                 pointerEvents: 'none',
@@ -691,12 +619,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                                     className="m-0 font-semibold"
                                     style={{
                                         fontSize: 'min(5svh, 3em)',
-                                        backgroundImage:
-                                            'linear-gradient(to bottom, #fff, #6f6fbe)',
-                                        backgroundSize: '1em 1.5em',
-                                        WebkitTextFillColor: 'transparent',
-                                        backgroundClip: 'text',
-                                        WebkitBackgroundClip: 'text',
+                                        color: 'rgba(255, 255, 255, 0.92)',
                                         display: 'block',
                                         gridArea: 'auto',
                                         borderRadius: '0',
@@ -712,12 +635,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                                         top: '-12px',
                                         fontSize: '16px',
                                         margin: '0 auto',
-                                        backgroundImage:
-                                            'linear-gradient(to bottom, #fff, #4a4ac0)',
-                                        backgroundSize: '1em 1.5em',
-                                        WebkitTextFillColor: 'transparent',
-                                        backgroundClip: 'text',
-                                        WebkitBackgroundClip: 'text',
+                                        color: 'rgba(255, 255, 255, 0.8)',
                                         display: 'block',
                                         gridArea: 'auto',
                                         borderRadius: '0',

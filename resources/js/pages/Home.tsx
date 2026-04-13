@@ -18,7 +18,7 @@ export default function Home() {
                     shape="square" // square, hexagon, circle, triangle
                     hoverTrailAmount={0} // number of trailing hovered shapes (0 = no trail)
                 /> */}
-                <div className="pt-25">
+                <div className="flex justify-center pt-25">
                     <Hero />
                 </div>
             </div>
