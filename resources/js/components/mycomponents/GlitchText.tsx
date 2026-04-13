@@ -114,7 +114,7 @@ const GlitchText: FC<GlitchTextProps> = ({
 
     const textStyle: React.CSSProperties = {
         position: 'relative',
-        fontSize: '64px',
+        fontSize: '44px',
         fontWeight: 900,
         color: 'white',
     };
@@ -125,7 +125,7 @@ const GlitchText: FC<GlitchTextProps> = ({
         left: 0,
         width: '100%',
         height: '100%',
-        fontSize: '64px',
+        fontSize: '44px',
         fontWeight: 900,
         color: 'white',
         background: 'black',

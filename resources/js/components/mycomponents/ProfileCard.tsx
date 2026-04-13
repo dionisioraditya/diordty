@@ -454,7 +454,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                     className="relative grid overflow-hidden"
                     style={{
                         height: '80svh',
-                        maxHeight: '540px',
+                        maxHeight: '440px',
                         aspectRatio: '0.718',
                         borderRadius: cardRadius,
                         backgroundBlendMode:
@@ -550,20 +550,19 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                                             </div>
                                         </div>
                                     </div>
-                                    <button
+                                    <a
+                                        href="https://www.linkedin.com/in/dionisio-raditya-prasmada-4a57661a4/"
                                         className="cursor-pointer rounded-lg border border-white/10 px-4 py-3 text-xs font-semibold text-white/90 backdrop-blur-[10px] transition-all duration-200 ease-out hover:-translate-y-px hover:border-white/40"
-                                        onClick={handleContactClick}
                                         style={{
                                             pointerEvents: 'auto',
                                             display: 'block',
                                             gridArea: 'auto',
                                             borderRadius: '8px',
                                         }}
-                                        type="button"
                                         aria-label={`Contact ${name || 'user'}`}
                                     >
                                         {contactText}
-                                    </button>
+                                    </a>
                                 </div>
                             )}
                         </div>

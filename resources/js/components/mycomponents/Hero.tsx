@@ -102,7 +102,7 @@ export default function Hero({ categories }: HeroProps) {
                     </div>
                 </div>
 
-                <div className="relative mx-auto w-full max-w-[420px]">
+                <div className="relative mx-auto w-full max-w-fit">
                     <div className="pointer-events-none absolute inset-0 rounded-[2rem] bg-linear-to-br from-cyan-400/14 via-blue-500/8 to-transparent blur-2xl" />
                     <div className="relative rounded-[2rem] border border-white/10 bg-white/4 p-3 shadow-[0_20px_80px_rgba(0,0,0,0.28)] backdrop-blur-md">
                         <ProfileCard
