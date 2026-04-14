@@ -53,7 +53,7 @@ export default function PostsCard({ project }: Props) {
                         <img
                             className="h-50 w-full object-cover"
                             src={
-                                `storage/app/public${project.image} ` ||
+                                `${project.image}` ||
                                 '/images/default-project.png'
                             }
                             alt=""
