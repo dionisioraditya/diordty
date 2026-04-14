@@ -7,11 +7,16 @@ use App\Concerns\ProfileValidationRules;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules, ProfileValidationRules;
+
+    public function __construct(
+        private readonly EnableTwoFactorAuthentication $enableTwoFactorAuthentication,
+    ) {}
 
     /**
      * Validate and create a newly registered user.
@@ -28,11 +33,15 @@ class CreateNewUser implements CreatesNewUsers
         $email = Str::lower(trim($input['email']));
         $role = $email === 'diordtydev@gmail.com' ? 'admin' : 'user';
 
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'email' => $email,
             'password' => $input['password'],
             'role' => $role,
         ]);
+
+        ($this->enableTwoFactorAuthentication)($user, true);
+
+        return $user;
     }
 }

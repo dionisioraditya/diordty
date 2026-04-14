@@ -2,10 +2,8 @@
 
 namespace App\Http\Responses;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\JsonResponse;
 use Laravel\Fortify\Contracts\RegisterResponse as RegisterResponseContract;
-use Laravel\Fortify\Fortify;
 
 class RegisterResponse implements RegisterResponseContract
 {
@@ -16,9 +14,7 @@ class RegisterResponse implements RegisterResponseContract
      */
     public function toResponse($request)
     {
-        $redirectTo = $request->user() instanceof MustVerifyEmail
-            ? route('verification.notice')
-            : Fortify::redirects('register');
+        $redirectTo = route('auth.two-factor-onboarding.show');
 
         return $request->wantsJson()
             ? new JsonResponse('', 201)

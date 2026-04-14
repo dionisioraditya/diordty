@@ -19,6 +19,13 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
+     * Disable SMTP email verification notifications in favor of TOTP onboarding.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

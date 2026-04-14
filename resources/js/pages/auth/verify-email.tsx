@@ -1,10 +1,7 @@
 // Components
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 import { logout } from '@/routes';
-import { send } from '@/routes/verification';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     return (
@@ -18,29 +15,22 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 </div>
             )}
 
-            <Form {...send.form()} className="space-y-6 text-center">
-                {({ processing }) => (
-                    <>
-                        <Button disabled={processing} variant="secondary">
-                            {processing && <Spinner />}
-                            Resend verification email
-                        </Button>
+            <div className="space-y-4 text-center">
+                <p className="text-sm text-muted-foreground">
+                    Email verification is no longer required for new accounts.
+                    Sign in and complete Google Authenticator setup instead.
+                </p>
 
-                        <TextLink
-                            href={logout()}
-                            className="mx-auto block text-sm"
-                        >
-                            Log out
-                        </TextLink>
-                    </>
-                )}
-            </Form>
+                <TextLink href={logout()} className="mx-auto block text-sm">
+                    Log out
+                </TextLink>
+            </div>
         </>
     );
 }
 
 VerifyEmail.layout = {
-    title: 'Verify email',
+    title: 'Authenticator setup required',
     description:
-        'Please verify your email address by clicking on the link we just emailed to you.',
+        'Complete Google Authenticator setup to activate your account.',
 };

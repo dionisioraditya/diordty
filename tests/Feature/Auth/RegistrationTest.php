@@ -21,5 +21,11 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('auth.two-factor-onboarding.show', absolute: false));
+
+    $user = \App\Models\User::where('email', 'test@example.com')->firstOrFail();
+
+    expect($user->email_verified_at)->toBeNull();
+    expect($user->two_factor_secret)->not->toBeNull();
+    expect($user->two_factor_confirmed_at)->toBeNull();
 });
