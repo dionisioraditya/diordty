@@ -17,6 +17,7 @@ type Project = {
     category: Category;
     description: string;
     image?: string | null;
+    image_url?: string | null;
 };
 
 type PaginatedProjects = {

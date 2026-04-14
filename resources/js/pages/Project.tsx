@@ -12,6 +12,7 @@ type Project = {
     slug?: string | null;
     description?: string | null;
     image?: string | null;
+    image_url?: string | null;
     demo_link?: string | null;
     github_link?: string | null;
     video_link?: string | null;
@@ -35,7 +36,7 @@ function normalizeImagePath(image?: string | null) {
 export default function Project({ project }: Props) {
     const title = project.title?.trim() || 'Untitled project';
     const description = project.description?.trim();
-    const imageSrc = normalizeImagePath(project.image);
+    const imageSrc = project.image_url || normalizeImagePath(project.image);
     const hasLinks = Boolean(project.github_link || project.video_link);
     const techstacks = project.techstacks ?? [];
     const videoLink = project.video_link

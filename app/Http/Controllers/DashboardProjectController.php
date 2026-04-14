@@ -7,6 +7,7 @@ use App\Support\ProjectDescriptionSanitizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -60,11 +61,11 @@ class DashboardProjectController extends Controller
             'image_file' => ['required', 'file', 'mimes:png,jpg,jpeg', 'max:51200'],
         ]);
 
-        $path = $validated['image_file']->store('temp', 'public');
+        $path = $validated['image_file']->store('temp', $this->projectImagesDiskName());
 
         return response()->json([
             'path' => $path,
-            'url' => Storage::disk('public')->url($path),
+            'url' => $this->projectImagesDisk()->url($path),
             'original_name' => $validated['image_file']->getClientOriginalName(),
         ]);
     }
@@ -77,8 +78,8 @@ class DashboardProjectController extends Controller
 
         $path = $validated['path'];
 
-        if ($this->isTempPath($path) && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+        if ($this->isTempPath($path) && $this->projectImagesDisk()->exists($path)) {
+            $this->projectImagesDisk()->delete($path);
         }
 
         return response()->json(['deleted' => true]);
@@ -124,7 +125,7 @@ class DashboardProjectController extends Controller
                 ]);
             }
 
-            if (!Storage::disk('public')->exists($data['image'])) {
+            if (!$this->projectImagesDisk()->exists($data['image'])) {
                 throw ValidationException::withMessages([
                     'image' => 'Uploaded image could not be found in temporary storage.',
                 ]);
@@ -150,7 +151,7 @@ class DashboardProjectController extends Controller
             ]);
         }
 
-        if (!Storage::disk('public')->exists($tempPath)) {
+        if (!$this->projectImagesDisk()->exists($tempPath)) {
             throw ValidationException::withMessages([
                 'image' => 'Uploaded image could not be found in temporary storage.',
             ]);
@@ -159,7 +160,7 @@ class DashboardProjectController extends Controller
         $extension = pathinfo($tempPath, PATHINFO_EXTENSION);
         $finalPath = sprintf('img/%s.%s', (string) Str::uuid(), $extension);
 
-        Storage::disk('public')->move($tempPath, $finalPath);
+        $this->projectImagesDisk()->move($tempPath, $finalPath);
 
         return $finalPath;
     }
@@ -171,9 +172,19 @@ class DashboardProjectController extends Controller
 
     private function deleteStoredImage(string $path): void
     {
-        if (Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+        if ($this->projectImagesDisk()->exists($path)) {
+            $this->projectImagesDisk()->delete($path);
         }
+    }
+
+    private function projectImagesDiskName(): string
+    {
+        return (string) config('filesystems.project_images_disk', 'public');
+    }
+
+    private function projectImagesDisk(): FilesystemAdapter
+    {
+        return Storage::disk($this->projectImagesDiskName());
     }
 
     private function generateUniqueSlug(string $title, ?int $ignoreId = null): string

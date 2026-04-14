@@ -35,6 +35,7 @@ type Project = {
     title: string;
     slug: string;
     image?: string | null;
+    image_url?: string | null;
     description?: string | null;
     demo_link?: string | null;
     github_link?: string | null;
@@ -327,7 +328,9 @@ export default function Dashboard() {
                 project.techstacks?.map((item) => String(item.id)) ?? [],
         });
         resetProjectImageState({ preserveExisting: true });
-        setProjectExistingImageUrl(normalizeStoredImagePath(project.image));
+        setProjectExistingImageUrl(
+            project.image_url ?? normalizeStoredImagePath(project.image),
+        );
         setProjectDialogOpen(true);
     };
 

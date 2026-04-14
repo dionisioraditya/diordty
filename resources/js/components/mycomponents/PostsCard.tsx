@@ -15,6 +15,7 @@ type Project = {
     category: Category;
     description: string;
     image?: string | null;
+    image_url?: string | null;
 };
 
 type Props = {
@@ -44,6 +45,7 @@ export default function PostsCard({ project }: Props) {
         categoryColorMap[project.category?.color] ??
         'bg-muted text-muted-foreground ring-1 ring-inset ring-border';
     const descriptionPreview = excerptHtml(project.description, 80);
+    const imageSrc = project.image_url || project.image || '/images/default-project.png';
 
     return (
         <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
@@ -52,11 +54,8 @@ export default function PostsCard({ project }: Props) {
                     <div className="relative overflow-hidden">
                         <img
                             className="h-50 w-full object-cover"
-                            src={
-                                `${project.image}` ||
-                                '/images/default-project.png'
-                            }
-                            alt=""
+                            src={imageSrc}
+                            alt={project.title}
                         />
                         <a
                             href={`/projects?category=${project.category.slug}`}
