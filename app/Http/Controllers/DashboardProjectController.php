@@ -61,7 +61,10 @@ class DashboardProjectController extends Controller
             'image_file' => ['required', 'file', 'mimes:png,jpg,jpeg', 'max:51200'],
         ]);
 
-        $path = $validated['image_file']->store('temp', $this->projectImagesDiskName());
+        $path = $validated['image_file']->storePublicly(
+            'temp',
+            $this->projectImagesDiskName(),
+        );
 
         return response()->json([
             'path' => $path,
@@ -161,6 +164,7 @@ class DashboardProjectController extends Controller
         $finalPath = sprintf('img/%s.%s', (string) Str::uuid(), $extension);
 
         $this->projectImagesDisk()->move($tempPath, $finalPath);
+        $this->projectImagesDisk()->setVisibility($finalPath, 'public');
 
         return $finalPath;
     }
