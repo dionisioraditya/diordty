@@ -19,6 +19,8 @@ Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name
 Route::middleware('auth')->group(function () {
     Route::get('/register/two-factor-setup', [TwoFactorOnboardingController::class, 'show'])
         ->name('auth.two-factor-onboarding.show');
+    Route::post('/register/two-factor-setup/enable', [TwoFactorOnboardingController::class, 'enable'])
+        ->name('auth.two-factor-onboarding.enable');
     Route::post('/register/two-factor-setup', [TwoFactorOnboardingController::class, 'store'])
         ->name('auth.two-factor-onboarding.store');
 });

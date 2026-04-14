@@ -1,8 +1,7 @@
 import { Form, Head } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { Check, Copy, ScanLine } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import AlertError from '@/components/alert-error';
+import { useMemo, useState } from 'react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -15,12 +14,8 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { useAppearance } from '@/hooks/use-appearance';
 import { useClipboard } from '@/hooks/use-clipboard';
-import {
-    OTP_MAX_LENGTH,
-    useTwoFactorAuth,
-} from '@/hooks/use-two-factor-auth';
+import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { logout } from '@/routes';
-import { enable } from '@/routes/two-factor';
 
 function GridScanIcon() {
     return (
@@ -51,32 +46,19 @@ function GridScanIcon() {
 type Props = {
     hasPendingSetup: boolean;
     requiresConfirmation: boolean;
+    qrCodeSvg: string | null;
+    manualSetupKey: string | null;
 };
 
 export default function TwoFactorOnboarding({
     hasPendingSetup,
     requiresConfirmation,
+    qrCodeSvg,
+    manualSetupKey,
 }: Props) {
     const { resolvedAppearance } = useAppearance();
     const [copiedText, copy] = useClipboard();
     const [code, setCode] = useState('');
-    const [hasRequestedSetup, setHasRequestedSetup] = useState(hasPendingSetup);
-    const [hasFetchedSetup, setHasFetchedSetup] = useState(false);
-    const {
-        qrCodeSvg,
-        manualSetupKey,
-        errors: setupErrors,
-        fetchSetupData,
-        clearErrors,
-    } = useTwoFactorAuth();
-
-    useEffect(() => {
-        if (!hasRequestedSetup || hasFetchedSetup) {
-            return;
-        }
-
-        void fetchSetupData().finally(() => setHasFetchedSetup(true));
-    }, [fetchSetupData, hasFetchedSetup, hasRequestedSetup]);
 
     const copyIcon = useMemo(
         () => (copiedText === manualSetupKey ? Check : Copy),
@@ -101,16 +83,10 @@ export default function TwoFactorOnboarding({
                     </p>
                 </div>
 
-                {setupErrors.length > 0 && <AlertError errors={setupErrors} />}
-
-                {!hasRequestedSetup ? (
+                {!hasPendingSetup ? (
                     <Form
-                        {...enable.form()}
-                        onSuccess={() => {
-                            clearErrors();
-                            setHasRequestedSetup(true);
-                            setHasFetchedSetup(false);
-                        }}
+                        action="/register/two-factor-setup/enable"
+                        method="post"
                         className="space-y-4"
                     >
                         {({ processing }) => (
@@ -144,7 +120,9 @@ export default function TwoFactorOnboarding({
                                             }}
                                         />
                                     ) : (
-                                        <Spinner />
+                                        <div className="text-sm text-muted-foreground">
+                                            QR code unavailable.
+                                        </div>
                                     )}
                                 </div>
                             </div>

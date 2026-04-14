@@ -10,6 +10,7 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
+use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
 
@@ -32,7 +33,25 @@ class TwoFactorOnboardingController extends Controller
                 'confirm',
             ),
             'hasPendingSetup' => ! is_null($user?->two_factor_secret),
+            'qrCodeSvg' => $user?->two_factor_secret
+                ? $user->twoFactorQrCodeSvg()
+                : null,
+            'manualSetupKey' => $user?->two_factor_secret
+                ? Fortify::currentEncrypter()->decrypt($user->two_factor_secret)
+                : null,
         ]);
+    }
+
+    /**
+     * Generate authenticator setup data for users who do not have a secret yet.
+     */
+    public function enable(
+        Request $request,
+        EnableTwoFactorAuthentication $enable,
+    ): RedirectResponse {
+        $enable($request->user(), true);
+
+        return redirect()->route('auth.two-factor-onboarding.show');
     }
 
     /**
