@@ -17,6 +17,10 @@ Route::get('/projects', [ProjectsController::class, 'index'])->name('projects');
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/verify-email', function () {
+        return redirect()->route('auth.two-factor-onboarding.show');
+    })->name('verification.notice');
+
     Route::get('/register/two-factor-setup', [TwoFactorOnboardingController::class, 'show'])
         ->name('auth.two-factor-onboarding.show');
     Route::post('/register/two-factor-setup/enable', [TwoFactorOnboardingController::class, 'enable'])

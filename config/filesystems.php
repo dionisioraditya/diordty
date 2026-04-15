@@ -12,10 +12,10 @@ return [
     | based disks are available to your application for file storage.
     |
     */
-
+    // 'project_images_disk' => env('PROJECT_IMAGES_DISK', 'public'),
     'default' => env('FILESYSTEM_DISK', 'local'),
 
-    'project_images_disk' => env('PROJECT_IMAGES_DISK', 'public'),
+    'project_images_disk' => 'public',
 
     /*
     |--------------------------------------------------------------------------
@@ -58,7 +58,6 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'visibility' => 'public',
             'throw' => false,
             'report' => false,
         ],
