@@ -4,6 +4,7 @@ import TechstackRotation from '@/components/mycomponents/TechStackRotation';
 import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import ConnectwtMe from '@/components/mycomponents/ConnectMe';
+import { useEffect, useState } from 'react';
 
 type Category = {
     id: number;
@@ -23,6 +24,45 @@ type Props = {
 };
 
 export default function Home({ categories, techstack }: Props) {
+    const [isDesktop, setIsDesktop] = useState(false);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const mediaQuery = window.matchMedia('(min-width: 1024px)');
+        const syncDesktopState = (event?: MediaQueryListEvent) => {
+            setIsDesktop(event?.matches ?? mediaQuery.matches);
+        };
+
+        syncDesktopState();
+
+        mediaQuery.addEventListener('change', syncDesktopState);
+
+        return () => {
+            mediaQuery.removeEventListener('change', syncDesktopState);
+        };
+    }, []);
+
+    const sectionMotionProps = (offsetX: number) =>
+        isDesktop
+            ? {
+                  initial: { opacity: 0, x: offsetX },
+                  whileInView: { opacity: 1, x: 0 },
+                  viewport: { once: false, amount: 0.2 },
+                  transition: {
+                      type: 'spring' as const,
+                      stiffness: 50,
+                      damping: 7,
+                  },
+              }
+            : {
+                  initial: false as const,
+                  animate: { opacity: 1, x: 0 },
+                  transition: { duration: 0 },
+              };
+
     return (
         <>
             <Head title="Home" />
@@ -30,14 +70,7 @@ export default function Home({ categories, techstack }: Props) {
                 <Navbar />
                 <div className="overflow-x-hidden lg:min-h-screen lg:snap-start">
                     <motion.section
-                        initial={{ opacity: 0.0, x: -500 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: false, amount: 0.2 }}
-                        transition={{
-                            type: 'spring',
-                            stiffness: 50,
-                            damping: 7,
-                        }}
+                        {...sectionMotionProps(-500)}
                         className="py-0 lg:flex lg:min-h-screen lg:items-center"
                     >
                         <div className="mx-auto flex max-w-7xl justify-center px-4 pt-24 pb-10 sm:px-6 lg:px-8 lg:pt-28">
@@ -48,14 +81,7 @@ export default function Home({ categories, techstack }: Props) {
 
                 <div className="overflow-x-hidden lg:min-h-screen lg:snap-start">
                     <motion.section
-                        initial={{ opacity: 0.0, x: 500 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: false, amount: 0.2 }}
-                        transition={{
-                            type: 'spring',
-                            stiffness: 50,
-                            damping: 7,
-                        }}
+                        {...sectionMotionProps(500)}
                         className="py-24 lg:flex lg:min-h-screen lg:items-center"
                     >
                         <div className="w-full">
@@ -66,14 +92,7 @@ export default function Home({ categories, techstack }: Props) {
 
                 <div className="overflow-x-hidden lg:min-h-screen lg:snap-start">
                     <motion.section
-                        initial={{ opacity: 0.0, x: -500 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: false, amount: 0.2 }}
-                        transition={{
-                            type: 'spring',
-                            stiffness: 50,
-                            damping: 7,
-                        }}
+                        {...sectionMotionProps(-500)}
                         className="pt-0 pb-24 lg:flex lg:min-h-screen lg:items-center"
                     >
                         <ConnectwtMe />
