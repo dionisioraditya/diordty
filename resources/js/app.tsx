@@ -1,11 +1,16 @@
 import { createInertiaApp } from '@inertiajs/react';
+import { createElement, StrictMode } from 'react';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+let appName =
+    document.title.trim() ||
+    document.querySelector('title')?.textContent?.trim() ||
+    'Laravel';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -25,9 +30,31 @@ createInertiaApp({
                 return AppLayout;
         }
     },
-    strictMode: true,
-    withApp(app) {
-        return <TooltipProvider delayDuration={0}>{app}</TooltipProvider>;
+    setup({ el, App, props }) {
+        appName =
+            typeof props.initialPage.props.name === 'string' &&
+            props.initialPage.props.name.trim() !== ''
+                ? props.initialPage.props.name
+                : appName;
+
+        if (!el) {
+            return;
+        }
+
+        const app = (
+            <StrictMode>
+                <TooltipProvider delayDuration={0}>
+                    {createElement(App, props)}
+                </TooltipProvider>
+            </StrictMode>
+        );
+
+        if (el.hasAttribute('data-server-rendered')) {
+            hydrateRoot(el, app);
+            return;
+        }
+
+        createRoot(el).render(app);
     },
     progress: {
         color: '#4B5563',
