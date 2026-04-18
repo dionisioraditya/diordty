@@ -84,12 +84,16 @@ function normalizeStoredImagePath(image?: string | null) {
     return `/storage/${image}`;
 }
 
-function getCsrfToken() {
-    return (
-        document
-            .querySelector<HTMLMetaElement>('meta[name="csrf-token"]')
-            ?.getAttribute('content') ?? ''
-    );
+function getXsrfTokenFromCookie() {
+    const cookie = document.cookie
+        .split('; ')
+        .find((item) => item.startsWith('XSRF-TOKEN='));
+
+    if (!cookie) {
+        return '';
+    }
+
+    return decodeURIComponent(cookie.slice('XSRF-TOKEN='.length));
 }
 
 function DashboardPanel({
@@ -226,7 +230,7 @@ export default function Dashboard() {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'X-XSRF-TOKEN': getXsrfTokenFromCookie(),
                     Accept: 'application/json',
                 },
                 body: JSON.stringify({ path }),
@@ -435,7 +439,7 @@ export default function Dashboard() {
             const response = await fetch('/dashboard/projects/upload-temp-image', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'X-XSRF-TOKEN': getXsrfTokenFromCookie(),
                     Accept: 'application/json',
                 },
                 body: formData,
