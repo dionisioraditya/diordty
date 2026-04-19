@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/mycomponents/Navbar';
 import PostsCard from '@/components/mycomponents/PostsCard';
+import PublicFooter from '@/components/mycomponents/PublicFooter';
 import SearchBar from '@/components/mycomponents/Searchbar';
 
 type Category = {
@@ -111,6 +112,8 @@ export default function Projects({ projects, categories, filters }: Props) {
                             </Link>
                         )}
                     </div>
+
+                    <PublicFooter />
                 </div>
             </div>
         </>

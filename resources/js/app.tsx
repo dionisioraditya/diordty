@@ -8,9 +8,11 @@ import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
 let appName =
-    document.title.trim() ||
-    document.querySelector('title')?.textContent?.trim() ||
-    'Laravel';
+    typeof document !== 'undefined'
+        ? document.title.trim() ||
+          document.querySelector('title')?.textContent?.trim() ||
+          'Laravel'
+        : 'Laravel';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -62,4 +64,6 @@ createInertiaApp({
 });
 
 // This will set light / dark mode on load...
-initializeTheme();
+if (typeof window !== 'undefined') {
+    initializeTheme();
+}

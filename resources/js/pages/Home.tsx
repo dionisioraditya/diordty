@@ -1,4 +1,5 @@
 import Navbar from '@/components/mycomponents/Navbar';
+import PublicFooter from '@/components/mycomponents/PublicFooter';
 import Hero from '@/components/mycomponents/Hero';
 import TechstackRotation from '@/components/mycomponents/TechStackRotation';
 import { Head } from '@inertiajs/react';
@@ -97,6 +98,7 @@ export default function Home({ categories, techstack }: Props) {
                     >
                         <ConnectwtMe />
                     </motion.section>
+                    <PublicFooter />
                 </div>
             </div>
         </>

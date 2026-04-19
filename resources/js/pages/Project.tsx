@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import Navbar from '@/components/mycomponents/Navbar';
+import PublicFooter from '@/components/mycomponents/PublicFooter';
 
 type Techstack = {
     id: number;
@@ -214,6 +215,8 @@ export default function Project({ project }: Props) {
                         </div>
                     </div>
                 </div>
+
+                <PublicFooter />
             </div>
         </>
     );
