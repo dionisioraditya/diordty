@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Support\ProjectDescriptionSanitizer;
+use App\Support\ProjectImageUpload;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -58,7 +59,12 @@ class DashboardProjectController extends Controller
     public function uploadTempImage(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'image_file' => ['required', 'file', 'mimes:png,jpg,jpeg', 'max:51200'],
+            'image_file' => [
+                'required',
+                'file',
+                'mimes:png,jpg,jpeg',
+                'max:'.ProjectImageUpload::maxKilobytes(),
+            ],
         ]);
 
         $path = $validated['image_file']->storePublicly(

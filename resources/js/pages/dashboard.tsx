@@ -50,6 +50,11 @@ type PageProps = {
     techstacks: Techstack[];
     categories: Category[];
     projects: Project[];
+    projectImageUpload: {
+        maxBytes: number;
+        maxKilobytes: number;
+        maxMegabytesLabel: string;
+    };
     errors: Record<string, string>;
 };
 
@@ -73,7 +78,6 @@ const emptyProjectForm = {
     techstack_ids: [] as string[],
 };
 
-const IMAGE_MAX_SIZE_BYTES = 50 * 1024 * 1024;
 const IMAGE_ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
 
 function normalizeStoredImagePath(image?: string | null) {
@@ -163,7 +167,7 @@ function DashboardListItem({
 }
 
 export default function Dashboard() {
-    const { techstacks, categories, projects, errors } =
+    const { techstacks, categories, projects, projectImageUpload, errors } =
         usePage<PageProps>().props;
 
     const [techstackDialogOpen, setTechstackDialogOpen] = useState(false);
@@ -411,8 +415,10 @@ export default function Dashboard() {
             return;
         }
 
-        if (file.size > IMAGE_MAX_SIZE_BYTES) {
-            setProjectImageError('Image size must not exceed 50MB.');
+        if (file.size > projectImageUpload.maxBytes) {
+            setProjectImageError(
+                `Image size must not exceed ${projectImageUpload.maxMegabytesLabel}MB.`,
+            );
             event.target.value = '';
             return;
         }
@@ -446,14 +452,26 @@ export default function Dashboard() {
                 credentials: 'same-origin',
             });
 
-            const payload = await response.json();
+            const responseContentType = response.headers.get('content-type') || '';
+            const responseText = await response.text();
+            const payload = responseContentType.includes('application/json')
+                ? JSON.parse(responseText)
+                : null;
 
             if (!response.ok) {
                 const serverError =
                     payload?.errors?.image_file?.[0] ??
                     payload?.message ??
-                    'Image upload failed.';
+                    (response.status === 413
+                        ? `Image size must not exceed ${projectImageUpload.maxMegabytesLabel}MB.`
+                        : responseText.includes('<html')
+                          ? 'Image upload failed before the server could return JSON. Check the server upload size limit and CSRF/session state.'
+                          : 'Image upload failed.');
                 throw new Error(serverError);
+            }
+
+            if (!payload) {
+                throw new Error('Upload response was not valid JSON.');
             }
 
             setProjectImageTempPath(payload.path);
@@ -918,9 +936,10 @@ export default function Dashboard() {
                                 }
                             />
                             <p className="text-xs text-muted-foreground">
-                                PNG, JPG, JPEG up to 50MB. Image is uploaded to
-                                temporary storage first, then moved when you
-                                create or update the project.
+                                PNG, JPG, JPEG up to{' '}
+                                {projectImageUpload.maxMegabytesLabel}MB. Image
+                                is uploaded to temporary storage first, then
+                                moved when you create or update the project.
                             </p>
                             <div className="overflow-hidden rounded-xl border border-dashed border-input bg-muted/20">
                                 {currentProjectImagePreview ? (

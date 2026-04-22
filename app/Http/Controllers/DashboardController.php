@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Project;
 use App\Models\Techstack;
+use App\Support\ProjectImageUpload;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,6 +29,11 @@ class DashboardController extends Controller
                 ])
                 ->latest()
                 ->get(),
+            'projectImageUpload' => [
+                'maxBytes' => ProjectImageUpload::maxBytes(),
+                'maxKilobytes' => ProjectImageUpload::maxKilobytes(),
+                'maxMegabytesLabel' => ProjectImageUpload::maxMegabytesLabel(),
+            ],
         ]);
     }
 }
