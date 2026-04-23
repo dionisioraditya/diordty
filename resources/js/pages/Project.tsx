@@ -1,6 +1,14 @@
 import { Head } from '@inertiajs/react';
 import Navbar from '@/components/mycomponents/Navbar';
 import PublicFooter from '@/components/mycomponents/PublicFooter';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import { useState } from 'react';
 
 type Techstack = {
     id: number;
@@ -35,6 +43,7 @@ function normalizeImagePath(image?: string | null) {
 }
 
 export default function Project({ project }: Props) {
+    const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
     const title = project.title?.trim() || 'Untitled project';
     const description = project.description?.trim();
     const imageSrc = project.image_url || normalizeImagePath(project.image);
@@ -67,7 +76,7 @@ export default function Project({ project }: Props) {
                 <div className="mt-10 pt-8 pb-16 lg:pt-16 lg:pb-24">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start xl:gap-14">
-                            <main className="min-w-0 w-full max-w-3xl">
+                            <main className="w-full max-w-3xl min-w-0">
                                 <a
                                     href="/projects"
                                     className="text-xs font-medium text-blue-500 hover:underline"
@@ -89,10 +98,10 @@ export default function Project({ project }: Props) {
                                     </div>
                                 )}
 
-                                <article className="min-w-0 break-words pt-5 text-base leading-8 text-white/70">
+                                <article className="min-w-0 pt-5 text-base leading-8 break-words text-white/70">
                                     {description ? (
                                         <div
-                                            className="min-w-0 break-words font-mono [&_.ql-align-center]:text-center [&_.ql-align-justify]:text-justify [&_.ql-align-right]:text-right [&_.ql-indent-1]:pl-6 [&_.ql-indent-2]:pl-12 [&_.ql-indent-3]:pl-18 [&_a]:break-words [&_a]:font-medium [&_a]:text-blue-400 [&_a]:underline [&_a]:decoration-blue-400/40 [&_a]:underline-offset-4 [&_blockquote]:my-8 [&_blockquote]:overflow-wrap-anywhere [&_blockquote]:border-l-4 [&_blockquote]:border-white/15 [&_blockquote]:pl-5 [&_blockquote]:text-white/60 [&_blockquote]:italic [&_code]:break-words [&_code]:rounded-md [&_code]:bg-white/8 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm [&_em]:italic [&_h1]:mt-10 [&_h1]:mb-4 [&_h1]:overflow-wrap-anywhere [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:font-extrabold [&_h1]:text-white [&_h2]:mt-9 [&_h2]:mb-4 [&_h2]:overflow-wrap-anywhere [&_h2]:text-3xl [&_h2]:leading-tight [&_h2]:font-bold [&_h2]:text-white [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:overflow-wrap-anywhere [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:text-white [&_img]:my-8 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-3xl [&_img]:border [&_img]:border-white/10 [&_img]:shadow-lg [&_li]:overflow-wrap-anywhere [&_li]:text-white/70 [&_ol]:my-6 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_p]:my-5 [&_p]:overflow-wrap-anywhere [&_p]:text-base [&_p]:leading-8 [&_p]:text-white/70 [&_pre]:my-8 [&_pre]:overflow-x-auto [&_pre]:rounded-2xl [&_pre]:border [&_pre]:border-white/10 [&_pre]:bg-black/30 [&_pre]:p-4 [&_pre]:text-sm [&_strong]:font-semibold [&_strong]:text-white [&_ul]:my-6 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6"
+                                            className="[&_blockquote]:overflow-wrap-anywhere [&_h1]:overflow-wrap-anywhere [&_h2]:overflow-wrap-anywhere [&_h3]:overflow-wrap-anywhere [&_li]:overflow-wrap-anywhere [&_p]:overflow-wrap-anywhere min-w-0 font-mono break-words [&_.ql-align-center]:text-center [&_.ql-align-justify]:text-justify [&_.ql-align-right]:text-right [&_.ql-indent-1]:pl-6 [&_.ql-indent-2]:pl-12 [&_.ql-indent-3]:pl-18 [&_a]:font-medium [&_a]:break-words [&_a]:text-blue-400 [&_a]:underline [&_a]:decoration-blue-400/40 [&_a]:underline-offset-4 [&_blockquote]:my-8 [&_blockquote]:border-l-4 [&_blockquote]:border-white/15 [&_blockquote]:pl-5 [&_blockquote]:text-white/60 [&_blockquote]:italic [&_code]:rounded-md [&_code]:bg-white/8 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm [&_code]:break-words [&_em]:italic [&_h1]:mt-10 [&_h1]:mb-4 [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:font-extrabold [&_h1]:text-white [&_h2]:mt-9 [&_h2]:mb-4 [&_h2]:text-3xl [&_h2]:leading-tight [&_h2]:font-bold [&_h2]:text-white [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:text-white [&_img]:my-8 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-3xl [&_img]:border [&_img]:border-white/10 [&_img]:shadow-lg [&_li]:text-white/70 [&_ol]:my-6 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_p]:my-5 [&_p]:text-base [&_p]:leading-8 [&_p]:text-white/70 [&_pre]:my-8 [&_pre]:overflow-x-auto [&_pre]:rounded-2xl [&_pre]:border [&_pre]:border-white/10 [&_pre]:bg-black/30 [&_pre]:p-4 [&_pre]:text-sm [&_strong]:font-semibold [&_strong]:text-white [&_ul]:my-6 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6"
                                             dangerouslySetInnerHTML={{
                                                 __html: description,
                                             }}
@@ -115,11 +124,48 @@ export default function Project({ project }: Props) {
                                 <div className="rounded-4xl border border-white/10 bg-[rgba(10,14,25,0.7)] p-5 shadow-[0_10px_30px_rgba(0,0,0,0.2)] backdrop-blur-md">
                                     <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
                                         {imageSrc ? (
-                                            <img
-                                                src={imageSrc}
-                                                alt={imageSrc}
-                                                className="h-56 w-full object-cover"
-                                            />
+                                            <Dialog
+                                                open={isImageDialogOpen}
+                                                onOpenChange={
+                                                    setIsImageDialogOpen
+                                                }
+                                            >
+                                                <DialogTrigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        aria-label="View full image"
+                                                        className="group block w-full cursor-zoom-in overflow-hidden"
+                                                    >
+                                                        <img
+                                                            src={imageSrc}
+                                                            alt={title}
+                                                            className="h-56 w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                                                        />
+                                                    </button>
+                                                </DialogTrigger>
+                                                <DialogContent
+                                                    className="border-white/10 bg-[rgba(5,8,16,0.98)] p-2 shadow-2xl sm:p-3"
+                                                    style={{
+                                                        width: '50vw',
+                                                        maxWidth: '90vw',
+                                                    }}
+                                                >
+                                                    <DialogTitle className="sr-only">
+                                                        {title} image preview
+                                                    </DialogTitle>
+                                                    <DialogDescription className="sr-only">
+                                                        Full-size preview for{' '}
+                                                        {title}.
+                                                    </DialogDescription>
+                                                    <div className="flex h-fit items-center justify-center overflow-hidden rounded-2xl bg-black/40">
+                                                        <img
+                                                            src={imageSrc}
+                                                            alt={title}
+                                                            className="h-full w-full object-contain"
+                                                        />
+                                                    </div>
+                                                </DialogContent>
+                                            </Dialog>
                                         ) : (
                                             <div className="flex hidden h-56 items-center justify-center bg-linear-to-br from-white/8 to-white/3 px-6 text-center text-sm text-white/45">
                                                 Preview image akan tampil di
