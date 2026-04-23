@@ -100,6 +100,17 @@ function getXsrfTokenFromCookie() {
     return decodeURIComponent(cookie.slice('XSRF-TOKEN='.length));
 }
 
+function getDeleteEndpoint(type: NonNullable<DeleteState>['type'], id: number) {
+    switch (type) {
+        case 'techstack':
+            return `/dashboard/techstacks/${id}`;
+        case 'category':
+            return `/dashboard/categories/${id}`;
+        case 'project':
+            return `/dashboard/projects/${id}`;
+    }
+}
+
 function DashboardPanel({
     title,
     description,
@@ -498,7 +509,7 @@ export default function Dashboard() {
     const confirmDelete = () => {
         if (!deleteState) return;
 
-        router.delete(`/dashboard/${deleteState.type}s/${deleteState.id}`, {
+        router.delete(getDeleteEndpoint(deleteState.type, deleteState.id), {
             preserveScroll: true,
             onSuccess: () => setDeleteState(null),
         });
