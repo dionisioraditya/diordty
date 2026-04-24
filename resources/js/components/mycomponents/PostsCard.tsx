@@ -45,7 +45,8 @@ export default function PostsCard({ project }: Props) {
         categoryColorMap[project.category?.color] ??
         'bg-muted text-muted-foreground ring-1 ring-inset ring-border';
     const descriptionPreview = excerptHtml(project.description, 80);
-    const imageSrc = project.image_url || project.image || '/images/default-project.png';
+    const imageSrc =
+        project.image_url || project.image || '/images/default-project.png';
 
     return (
         <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
@@ -59,7 +60,7 @@ export default function PostsCard({ project }: Props) {
                         />
                         <a
                             href={`/projects?category=${project.category.slug}`}
-                            className={`absolute top-4 left-4 inline-flex rounded-full px-3 py-1 font-mono text-xs opacity-40 ${categoryBadgeClass}`}
+                            className={`absolute top-4 left-4 inline-flex rounded-full px-3 py-1 font-mono text-xs opacity-70 ${categoryBadgeClass}`}
                         >
                             {project.category?.name}
                         </a>
