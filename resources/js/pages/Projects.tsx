@@ -60,35 +60,42 @@ export default function Projects({ projects, categories, filters }: Props) {
                             category={filters.category}
                         />
                     </motion.div>
+                    <div className="overflow-x-hidden overflow-y-hidden pb-100">
+                        {projects.data.length > 0 ? (
+                            <motion.div
+                                initial={{ scale: 0, x: 0 }}
+                                animate={{ scale: 1, x: 0 }}
+                                transition={{
+                                    duration: 0.2,
+                                    type: 'spring',
+                                    stiffness: 50,
+                                    damping: 7,
+                                }}
+                            >
+                                <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 px-4 pt-10 sm:grid-cols-2 lg:grid-cols-3">
+                                    {projects.data.map((project) => (
+                                        <PostsCard
+                                            key={project.id}
+                                            project={project}
+                                        />
+                                    ))}
+                                </div>
+                            </motion.div>
+                        ) : (
+                            <div className="mx-auto max-w-7xl px-4 pt-10">
+                                <div className="rounded-base border-default bg-neutral-primary-soft p-8 text-center">
+                                    <h2 className="text-heading text-xl font-semibold">
+                                        No projects found
+                                    </h2>
+                                    <p className="text-body mt-2">
+                                        Try a different keyword or category to
+                                        find matching projects.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
-                    {projects.data.length > 0 ? (
-                        <motion.div
-                            initial={{ opacity: 0, y: -100 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 1.0 }}
-                        >
-                            <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 px-4 pt-10 sm:grid-cols-2 lg:grid-cols-3">
-                                {projects.data.map((project) => (
-                                    <PostsCard
-                                        key={project.id}
-                                        project={project}
-                                    />
-                                ))}
-                            </div>
-                        </motion.div>
-                    ) : (
-                        <div className="mx-auto max-w-7xl px-4 pt-10">
-                            <div className="rounded-base border-default bg-neutral-primary-soft p-8 text-center">
-                                <h2 className="text-heading text-xl font-semibold">
-                                    No projects found
-                                </h2>
-                                <p className="text-body mt-2">
-                                    Try a different keyword or category to find
-                                    matching projects.
-                                </p>
-                            </div>
-                        </div>
-                    )}
                     <div className="mt-8 flex items-center justify-center gap-4 pb-5">
                         {projects.prev_page_url && (
                             <Link
@@ -112,7 +119,6 @@ export default function Projects({ projects, categories, filters }: Props) {
                             </Link>
                         )}
                     </div>
-
                     <PublicFooter />
                 </div>
             </div>
