@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { index as projectsIndex } from '@/actions/App/Http/Controllers/ProjectsController';
 
 type Category = {
@@ -22,12 +22,17 @@ export default function SearchBar({
     const [open, setOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(category);
     const [query, setQuery] = useState(search);
+    const lastSubmittedFiltersRef = useRef({ search, category });
 
     const selectedCategoryLabel =
         categories.find((item) => item.slug === selectedCategory)?.name ??
         'All categories';
 
     const submitFilters = (nextCategory: string, nextQuery: string) => {
+        lastSubmittedFiltersRef.current = {
+            search: nextQuery,
+            category: nextCategory,
+        };
         router.get(
             projectsIndex.url({
                 query: {
@@ -35,17 +40,39 @@ export default function SearchBar({
                     category: nextCategory || undefined,
                 },
             }),
+            {},
+            {
+                only: ['projects', 'filters'],
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            },
         );
     };
 
+    useEffect(() => {
+        setSelectedCategory(category);
+        setQuery(search);
+        lastSubmittedFiltersRef.current = { search, category };
+    }, [category, search]);
+
+    useEffect(() => {
+        if (
+            query === lastSubmittedFiltersRef.current.search &&
+            selectedCategory === lastSubmittedFiltersRef.current.category
+        ) {
+            return;
+        }
+
+        const timeoutId = window.setTimeout(() => {
+            submitFilters(selectedCategory, query);
+        }, 300);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [query, selectedCategory]);
+
     return (
-        <form
-            className="mx-auto max-w-2xl"
-            onSubmit={(e) => {
-                e.preventDefault();
-                submitFilters(selectedCategory, query);
-            }}
-        >
+        <div className="mx-auto max-w-2xl">
             <div className="rounded-base relative flex gap-1.5 -space-x-0.5 shadow-xs">
                 {/* Dropdown Button */}
                 <button
@@ -73,6 +100,10 @@ export default function SearchBar({
                                     onClick={() => {
                                         setSelectedCategory('');
                                         setOpen(false);
+                                        lastSubmittedFiltersRef.current = {
+                                            search: query,
+                                            category: '',
+                                        };
                                         submitFilters('', query);
                                     }}
                                     className="hover:bg-neutral-tertiary-medium hover:text-heading block w-full rounded-md p-2 text-left"
@@ -87,6 +118,10 @@ export default function SearchBar({
                                         onClick={() => {
                                             setSelectedCategory(item.slug);
                                             setOpen(false);
+                                            lastSubmittedFiltersRef.current = {
+                                                search: query,
+                                                category: item.slug,
+                                            };
                                             submitFilters(item.slug, query);
                                         }}
                                         className="hover:bg-neutral-tertiary-medium hover:text-heading block w-full rounded-md p-2 text-left"
@@ -107,22 +142,7 @@ export default function SearchBar({
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
-
-                {/* Button */}
-                <button
-                    type="submit"
-                    className="bg-brand rounded-e-base hover:bg-brand-strong inline-flex items-center px-4 py-2.5 text-sm font-medium text-white focus:outline-none"
-                >
-                    <svg className="me-1.5 h-4 w-4" viewBox="0 0 24 24">
-                        <path
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
-                        />
-                    </svg>
-                    Search
-                </button>
             </div>
-        </form>
+        </div>
     );
 }
