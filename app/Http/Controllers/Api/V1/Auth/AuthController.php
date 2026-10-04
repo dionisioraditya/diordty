@@ -22,11 +22,29 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
+        // 1. Check if public registration is disabled
+        if (config('app.allow_registration', env('ALLOW_REGISTRATION', true)) === false) {
+            return response()->json([
+                'message' => 'Public registration is currently disabled.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', Password::min(8)->letters()->numbers()],
         ]);
+
+        // 2. Check if email whitelist is enabled
+        $whitelistStr = env('ALLOWED_REGISTRATION_EMAILS', '');
+        if (! empty($whitelistStr)) {
+            $allowedEmails = array_map('strtolower', array_filter(array_map('trim', explode(',', $whitelistStr))));
+            if (! in_array(strtolower($validated['email']), $allowedEmails, true)) {
+                return response()->json([
+                    'message' => 'Registration is restricted to authorized email addresses.',
+                ], 403);
+            }
+        }
 
         $user = User::create([
             'name' => $validated['name'],

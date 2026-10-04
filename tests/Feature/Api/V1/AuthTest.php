@@ -87,3 +87,35 @@ test('authenticated user can logout and revoke token', function () {
 
     expect($user->tokens()->count())->toBe(0);
 });
+
+test('registration is blocked when email is not in whitelist', function () {
+    putenv('ALLOWED_REGISTRATION_EMAILS=owner@diordty.tech,me@example.com');
+
+    $response = $this->postJson('/api/v1/auth/register', [
+        'name' => 'Stranger',
+        'email' => 'hacker@evil.com',
+        'password' => 'secret12345',
+    ]);
+
+    $response->assertStatus(403)
+        ->assertJson(['message' => 'Registration is restricted to authorized email addresses.']);
+
+    // Reset env
+    putenv('ALLOWED_REGISTRATION_EMAILS=');
+});
+
+test('registration succeeds when email is in whitelist', function () {
+    putenv('ALLOWED_REGISTRATION_EMAILS=owner@diordty.tech,me@example.com');
+
+    $response = $this->postJson('/api/v1/auth/register', [
+        'name' => 'Owner',
+        'email' => 'owner@diordty.tech',
+        'password' => 'secret12345',
+    ]);
+
+    $response->assertCreated();
+
+    // Reset env
+    putenv('ALLOWED_REGISTRATION_EMAILS=');
+});
+
