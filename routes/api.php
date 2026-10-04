@@ -9,10 +9,10 @@ use App\Http\Controllers\Api\V1\Finance\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
-    // Auth endpoints
+    // Auth endpoints with rate limiting
     Route::prefix('auth')->group(function () {
-        Route::post('/register', [AuthController::class, 'register']);
-        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+        Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/logout', [AuthController::class, 'logout']);
@@ -20,8 +20,8 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    // Finance endpoints (authenticated)
-    Route::middleware('auth:sanctum')->prefix('finance')->group(function () {
+    // Finance endpoints (authenticated & throttled)
+    Route::middleware(['auth:sanctum', 'throttle:120,1'])->prefix('finance')->group(function () {
         // Categories
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::post('/categories', [CategoryController::class, 'store']);
@@ -48,7 +48,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/mutations', [ColdWalletController::class, 'mutations']);
         });
 
-        // Offline-First Sync
-        Route::post('/sync', [SyncController::class, 'sync']);
+        // Offline-First Sync (dedicated throttle)
+        Route::post('/sync', [SyncController::class, 'sync'])->middleware('throttle:60,1');
     });
 });

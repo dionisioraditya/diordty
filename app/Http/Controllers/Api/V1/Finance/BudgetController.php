@@ -102,16 +102,22 @@ class BudgetController extends Controller
      */
     public function storeOrUpdate(Request $request): JsonResponse
     {
+        $userId = $request->user()->id;
+
         $validated = $request->validate([
             'id' => ['nullable', 'uuid'],
             'month' => ['required', 'regex:/^\d{4}-\d{2}$/'],
             'total_budget' => ['required', 'numeric', 'min:0'],
             'allocations' => ['nullable', 'array'],
-            'allocations.*.category_id' => ['required_with:allocations', 'uuid', 'exists:finance_categories,id'],
+            'allocations.*.category_id' => [
+                'required_with:allocations',
+                'uuid',
+                \Illuminate\Validation\Rule::exists('finance_categories', 'id')->where(function ($query) use ($userId) {
+                    $query->where('user_id', $userId)->whereNull('deleted_at');
+                }),
+            ],
             'allocations.*.allocated_amount' => ['required_with:allocations', 'numeric', 'min:0'],
         ]);
-
-        $userId = $request->user()->id;
         $month = $validated['month'];
 
         $budget = DB::transaction(function () use ($validated, $userId, $month) {

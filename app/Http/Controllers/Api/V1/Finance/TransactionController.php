@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class TransactionController extends Controller
 {
@@ -51,14 +52,15 @@ class TransactionController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = '%'.strtolower($request->query('search')).'%';
+            $searchTerm = addcslashes(strtolower($request->query('search')), '%_');
+            $search = '%'.$searchTerm.'%';
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(name) LIKE ?', [$search])
                     ->orWhereRaw('LOWER(notes) LIKE ?', [$search]);
             });
         }
 
-        $perPage = min((int) $request->query('per_page', 50), 100);
+        $perPage = max(1, min((int) $request->query('per_page', 50), 100));
 
         $transactions = $query->orderBy('transaction_date', 'desc')
             ->orderBy('created_at', 'desc')
@@ -72,21 +74,29 @@ class TransactionController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $userId = $request->user()->id;
+
         $validated = $request->validate([
             'id' => ['nullable', 'uuid'],
-            'category_id' => ['nullable', 'uuid', 'exists:finance_categories,id'],
+            'category_id' => [
+                'nullable',
+                'uuid',
+                Rule::exists('finance_categories', 'id')->where(function ($query) use ($userId) {
+                    $query->where('user_id', $userId)->whereNull('deleted_at');
+                }),
+            ],
             'wallet_type' => ['nullable', 'string', 'in:monthly_budget,cold_wallet'],
             'transaction_type' => ['nullable', 'string', 'in:expense,external_inflow,external_outflow,rollover_to_cold_wallet'],
             'name' => ['required', 'string', 'max:255'],
-            'amount' => ['required', 'numeric', 'min:0.01'],
+            'amount' => ['required', 'numeric', 'min:0.01', 'max:999999999999.99'],
             'transaction_date' => ['required', 'date_format:Y-m-d'],
-            'receipt_url' => ['nullable', 'string', 'max:1000'],
+            'receipt_url' => ['nullable', 'url', 'max:1000'],
             'notes' => ['nullable', 'string'],
         ]);
 
         $transaction = Transaction::create([
             'id' => $validated['id'] ?? (string) Str::uuid(),
-            'user_id' => $request->user()->id,
+            'user_id' => $userId,
             'category_id' => $validated['category_id'] ?? null,
             'wallet_type' => $validated['wallet_type'] ?? 'monthly_budget',
             'transaction_type' => $validated['transaction_type'] ?? 'expense',
@@ -125,18 +135,26 @@ class TransactionController extends Controller
      */
     public function update(Request $request, string $id): JsonResponse
     {
-        $transaction = Transaction::where('user_id', $request->user()->id)
+        $userId = $request->user()->id;
+
+        $transaction = Transaction::where('user_id', $userId)
             ->where('id', $id)
             ->firstOrFail();
 
         $validated = $request->validate([
-            'category_id' => ['nullable', 'uuid', 'exists:finance_categories,id'],
+            'category_id' => [
+                'nullable',
+                'uuid',
+                Rule::exists('finance_categories', 'id')->where(function ($query) use ($userId) {
+                    $query->where('user_id', $userId)->whereNull('deleted_at');
+                }),
+            ],
             'wallet_type' => ['sometimes', 'string', 'in:monthly_budget,cold_wallet'],
             'transaction_type' => ['sometimes', 'string', 'in:expense,external_inflow,external_outflow,rollover_to_cold_wallet'],
             'name' => ['sometimes', 'string', 'max:255'],
-            'amount' => ['sometimes', 'numeric', 'min:0.01'],
+            'amount' => ['sometimes', 'numeric', 'min:0.01', 'max:999999999999.99'],
             'transaction_date' => ['sometimes', 'date_format:Y-m-d'],
-            'receipt_url' => ['nullable', 'string', 'max:1000'],
+            'receipt_url' => ['nullable', 'url', 'max:1000'],
             'notes' => ['nullable', 'string'],
         ]);
 

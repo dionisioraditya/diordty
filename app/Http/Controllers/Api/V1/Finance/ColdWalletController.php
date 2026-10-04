@@ -114,13 +114,15 @@ class ColdWalletController extends Controller
     {
         $userId = $request->user()->id;
 
+        $perPage = max(1, min((int) $request->query('per_page', 50), 100));
+
         $mutations = Transaction::with('category')
             ->where('user_id', $userId)
             ->where('wallet_type', 'cold_wallet')
             ->whereIn('transaction_type', ['external_inflow', 'external_outflow'])
             ->orderBy('transaction_date', 'desc')
             ->orderBy('created_at', 'desc')
-            ->paginate((int) $request->query('per_page', 50));
+            ->paginate($perPage);
 
         return response()->json($mutations);
     }
