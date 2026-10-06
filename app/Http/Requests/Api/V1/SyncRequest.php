@@ -24,7 +24,7 @@ class SyncRequest extends FormRequest
             'push.categories.*.name' => ['required_without:push.categories.*.deleted_at', 'nullable', 'string', 'max:255'],
             'push.categories.*.icon' => ['nullable', 'string', 'max:100'],
             'push.categories.*.color' => ['nullable', 'string', 'max:50'],
-            'push.categories.*.type' => ['nullable', 'string', 'in:expense,income,both'],
+            'push.categories.*.type' => ['nullable', 'string', 'in:expense,external_income,external_expense,income,both'],
             'push.categories.*.sort_order' => ['nullable', 'integer'],
 
             // Monthly Budgets

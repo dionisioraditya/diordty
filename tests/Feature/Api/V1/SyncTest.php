@@ -122,3 +122,49 @@ test('offline deletion soft-deletes records on server', function () {
         'id' => $tx->id,
     ]);
 });
+
+test('android sync can batch push cold wallet categories with external_income and external_expense types', function () {
+    $incomeCatId = (string) Str::uuid();
+    $expenseCatId = (string) Str::uuid();
+
+    $payload = [
+        'push' => [
+            'categories' => [
+                [
+                    'id' => $incomeCatId,
+                    'name' => 'Dividen Saham',
+                    'icon' => '📈',
+                    'color' => '#009688',
+                    'type' => 'external_income',
+                    'sort_order' => 10,
+                ],
+                [
+                    'id' => $expenseCatId,
+                    'name' => 'Beli Hardware Wallet',
+                    'icon' => '💻',
+                    'color' => '#E91E63',
+                    'type' => 'external_expense',
+                    'sort_order' => 11,
+                ],
+            ],
+        ],
+    ];
+
+    $response = $this->postJson('/api/v1/finance/sync', $payload);
+
+    $response->assertOk();
+
+    $this->assertDatabaseHas('finance_categories', [
+        'id' => $incomeCatId,
+        'user_id' => $this->user->id,
+        'name' => 'Dividen Saham',
+        'type' => 'external_income',
+    ]);
+
+    $this->assertDatabaseHas('finance_categories', [
+        'id' => $expenseCatId,
+        'user_id' => $this->user->id,
+        'name' => 'Beli Hardware Wallet',
+        'type' => 'external_expense',
+    ]);
+});
