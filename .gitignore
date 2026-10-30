@@ -28,3 +28,10 @@ yarn-error.log
 /.zed
 /graphify-out/
 .graphify*
+graph.json
+graph.html
+GRAPH_REPORT.md
+.graphify/
+graphify_out/
+.graphify_*.json
+AGENTS.md
