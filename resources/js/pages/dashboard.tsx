@@ -1,7 +1,8 @@
 import { Head, router, useForm, usePage } from '@inertiajs/react';
-import { RichTextEditor } from '@/components/mycomponents/RichTextEditor';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { ProjectFormModal } from '@/components/dashboard/ProjectFormModal';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogContent,
@@ -12,16 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { dashboard } from '@/routes';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
 
 type Techstack = {
     id: number;
@@ -81,9 +73,17 @@ const emptyProjectForm = {
 const IMAGE_ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
 
 function normalizeStoredImagePath(image?: string | null) {
-    if (!image) return null;
-    if (image.startsWith('http://') || image.startsWith('https://')) return image;
-    if (image.startsWith('/')) return image;
+    if (!image) {
+return null;
+}
+
+    if (image.startsWith('http://') || image.startsWith('https://')) {
+return image;
+}
+
+    if (image.startsWith('/')) {
+return image;
+}
 
     return `/storage/${image}`;
 }
@@ -215,15 +215,21 @@ export default function Dashboard() {
     const latestProjects = useMemo(() => projects.slice(0, 8), [projects]);
 
     useEffect(() => {
-        if (!techstackDialogOpen) techstackForm.clearErrors();
+        if (!techstackDialogOpen) {
+techstackForm.clearErrors();
+}
     }, [techstackDialogOpen]);
 
     useEffect(() => {
-        if (!categoryDialogOpen) categoryForm.clearErrors();
+        if (!categoryDialogOpen) {
+categoryForm.clearErrors();
+}
     }, [categoryDialogOpen]);
 
     useEffect(() => {
-        if (!projectDialogOpen) projectForm.clearErrors();
+        if (!projectDialogOpen) {
+projectForm.clearErrors();
+}
     }, [projectDialogOpen]);
 
     useEffect(() => {
@@ -238,7 +244,9 @@ export default function Dashboard() {
     }, [projectImagePreviewUrl]);
 
     const cleanupTempImage = async (path: string | null) => {
-        if (!path) return;
+        if (!path) {
+return;
+}
 
         try {
             await fetch('/dashboard/projects/upload-temp-image', {
@@ -423,6 +431,7 @@ export default function Dashboard() {
                 'Image must be in PNG, JPG, or JPEG format.',
             );
             event.target.value = '';
+
             return;
         }
 
@@ -431,6 +440,7 @@ export default function Dashboard() {
                 `Image size must not exceed ${projectImageUpload.maxMegabytesLabel}MB.`,
             );
             event.target.value = '';
+
             return;
         }
 
@@ -478,6 +488,7 @@ export default function Dashboard() {
                         : responseText.includes('<html')
                           ? 'Image upload failed before the server could return JSON. Check the server upload size limit and CSRF/session state.'
                           : 'Image upload failed.');
+
                 throw new Error(serverError);
             }
 
@@ -507,7 +518,9 @@ export default function Dashboard() {
     const currentProjectImagePreview = projectImagePreviewUrl || projectExistingImageUrl;
 
     const confirmDelete = () => {
-        if (!deleteState) return;
+        if (!deleteState) {
+return;
+}
 
         router.delete(getDeleteEndpoint(deleteState.type, deleteState.id), {
             preserveScroll: true,
@@ -895,246 +908,21 @@ export default function Dashboard() {
                 </DialogContent>
             </Dialog>
 
-            <Dialog
-                open={projectDialogOpen}
-                onOpenChange={(open) => {
-                    if (open) {
-                        setProjectDialogOpen(true);
-                        return;
-                    }
-
-                    void closeProjectDialog();
-                }}
-            >
-                <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
-                    <DialogHeader>
-                        <DialogTitle>
-                            {editingProjectId
-                                ? 'Update project'
-                                : 'Create project'}
-                        </DialogTitle>
-                        <DialogDescription>
-                            Kelola seluruh field project beserta category dan
-                            techstack.
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="project-title">Title</Label>
-                            <Input
-                                id="project-title"
-                                value={projectForm.data.title}
-                                onChange={(e) =>
-                                    projectForm.setData('title', e.target.value)
-                                }
-                            />
-                            {projectForm.errors.title && (
-                                <p className="text-sm text-destructive">
-                                    {projectForm.errors.title}
-                                </p>
-                            )}
-                        </div>
-
-                        <div className="grid gap-2 md:col-span-2">
-                            <Label htmlFor="project-image">Image</Label>
-                            <Input
-                                id="project-image"
-                                type="file"
-                                accept=".png,.jpg,.jpeg,image/png,image/jpeg"
-                                onChange={(e) =>
-                                    void handleProjectImageSelection(e)
-                                }
-                            />
-                            <p className="text-xs text-muted-foreground">
-                                PNG, JPG, JPEG up to{' '}
-                                {projectImageUpload.maxMegabytesLabel}MB. Image
-                                is uploaded to temporary storage first, then
-                                moved when you create or update the project.
-                            </p>
-                            <div className="overflow-hidden rounded-xl border border-dashed border-input bg-muted/20">
-                                {currentProjectImagePreview ? (
-                                    <img
-                                        src={currentProjectImagePreview}
-                                        alt="Project preview"
-                                        className="h-56 w-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="flex h-56 items-center justify-center px-4 text-center text-sm text-muted-foreground">
-                                        Image preview will appear here.
-                                    </div>
-                                )}
-                            </div>
-                            {projectImageUploading && (
-                                <p className="text-sm text-muted-foreground">
-                                    Uploading image...
-                                </p>
-                            )}
-                            {(projectImageError || projectForm.errors.image) && (
-                                <p className="text-sm text-destructive">
-                                    {projectImageError ?? projectForm.errors.image}
-                                </p>
-                            )}
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label>Category</Label>
-                            <Select
-                                value={
-                                    projectForm.data.category_id || '__none__'
-                                }
-                                onValueChange={(value) =>
-                                    projectForm.setData(
-                                        'category_id',
-                                        value === '__none__' ? '' : value,
-                                    )
-                                }
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="__none__">
-                                        No category
-                                    </SelectItem>
-                                    {categories.map((category) => (
-                                        <SelectItem
-                                            key={category.id}
-                                            value={String(category.id)}
-                                        >
-                                            {category.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label>Techstacks</Label>
-                            <div className="max-h-40 space-y-2 overflow-y-auto rounded-md border border-input p-3">
-                                {techstacks.map((techstack) => (
-                                    <label
-                                        key={techstack.id}
-                                        className="flex items-center gap-2 text-sm"
-                                    >
-                                        <Checkbox
-                                            checked={projectForm.data.techstack_ids.includes(
-                                                String(techstack.id),
-                                            )}
-                                            onCheckedChange={() =>
-                                                toggleTechstackSelection(
-                                                    String(techstack.id),
-                                                )
-                                            }
-                                        />
-                                        <span>{techstack.name}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="project-demo-link">Demo link</Label>
-                            <Input
-                                id="project-demo-link"
-                                value={projectForm.data.demo_link}
-                                onChange={(e) =>
-                                    projectForm.setData(
-                                        'demo_link',
-                                        e.target.value,
-                                    )
-                                }
-                            />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="project-github-link">
-                                Github link
-                            </Label>
-                            <Input
-                                id="project-github-link"
-                                value={projectForm.data.github_link}
-                                onChange={(e) =>
-                                    projectForm.setData(
-                                        'github_link',
-                                        e.target.value,
-                                    )
-                                }
-                            />
-                        </div>
-
-                        <div className="grid gap-2 md:col-span-2">
-                            <Label htmlFor="project-video-link">
-                                Video link
-                            </Label>
-                            <Input
-                                id="project-video-link"
-                                value={projectForm.data.video_link}
-                                onChange={(e) =>
-                                    projectForm.setData(
-                                        'video_link',
-                                        e.target.value,
-                                    )
-                                }
-                            />
-                        </div>
-
-                        <div className="grid gap-2 md:col-span-2">
-                            <Label htmlFor="project-description">
-                                Description
-                            </Label>
-                            <textarea
-                                id="project-description"
-                                value={projectForm.data.description}
-                                onChange={(e) =>
-                                    projectForm.setData(
-                                        'description',
-                                        e.target.value,
-                                    )
-                                }
-                                rows={6}
-                                className="min-h-32 rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                            />
-                            <RichTextEditor
-                                id="project-description-editor"
-                                value={projectForm.data.description || ''}
-                                onChange={(value) =>
-                                    projectForm.setData('description', value)
-                                }
-                                placeholder="Write the project description in rich text..."
-                            />
-                        </div>
-
-                        <div className="grid gap-2 md:col-span-2">
-                            <Label htmlFor="project-info">Extra info</Label>
-                            <textarea
-                                id="project-info"
-                                value={projectForm.data.info}
-                                onChange={(e) =>
-                                    projectForm.setData('info', e.target.value)
-                                }
-                                rows={4}
-                                className="min-h-24 rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                            />
-                        </div>
-                    </div>
-
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => void closeProjectDialog()}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            onClick={submitProject}
-                            disabled={projectForm.processing || projectImageUploading}
-                        >
-                            {editingProjectId ? 'Update' : 'Create'}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <ProjectFormModal
+                isOpen={projectDialogOpen}
+                onClose={closeProjectDialog}
+                editingProjectId={editingProjectId}
+                projectForm={projectForm}
+                categories={categories}
+                techstacks={techstacks}
+                projectImageUpload={projectImageUpload}
+                projectImageUploading={projectImageUploading}
+                projectImageError={projectImageError}
+                currentProjectImagePreview={currentProjectImagePreview}
+                handleProjectImageSelection={handleProjectImageSelection}
+                toggleTechstackSelection={toggleTechstackSelection}
+                onSubmit={submitProject}
+            />
 
             <Dialog
                 open={Boolean(deleteState)}

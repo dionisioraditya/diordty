@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useState } from 'react';
 import Navbar from '@/components/mycomponents/Navbar';
 import PublicFooter from '@/components/mycomponents/PublicFooter';
 import {
@@ -8,7 +9,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { useState } from 'react';
 
 type Techstack = {
     id: number;
@@ -34,10 +34,17 @@ type Props = {
 };
 
 function normalizeImagePath(image?: string | null) {
-    if (!image) return null;
-    if (image.startsWith('http://') || image.startsWith('https://'))
-        return image;
-    if (image.startsWith('/')) return image;
+    if (!image) {
+return null;
+}
+
+    if (image.startsWith('http://') || image.startsWith('https://')) {
+return image;
+}
+
+    if (image.startsWith('/')) {
+return image;
+}
 
     return `/storage/${image}`;
 }
@@ -98,16 +105,15 @@ export default function Project({ project }: Props) {
                                     </div>
                                 )}
 
-                                <article className="min-w-0 pt-5 text-base leading-8 break-words text-white/70">
+                                <article className="prose prose-invert prose-blue max-w-none pt-4 text-base leading-relaxed text-white/80 prose-headings:font-heading prose-headings:text-white prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-p:leading-8 prose-a:text-blue-400 prose-a:underline-offset-4 hover:prose-a:text-blue-300 prose-blockquote:border-l-primary prose-blockquote:text-white/70 prose-blockquote:italic prose-code:rounded-md prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-pre:rounded-2xl prose-pre:border prose-pre:border-white/10 prose-pre:bg-black/40 prose-img:rounded-2xl prose-hr:border-white/10">
                                     {description ? (
                                         <div
-                                            className="[&_blockquote]:overflow-wrap-anywhere [&_h1]:overflow-wrap-anywhere [&_h2]:overflow-wrap-anywhere [&_h3]:overflow-wrap-anywhere [&_li]:overflow-wrap-anywhere [&_p]:overflow-wrap-anywhere min-w-0 font-mono break-words [&_.ql-align-center]:text-center [&_.ql-align-justify]:text-justify [&_.ql-align-right]:text-right [&_.ql-indent-1]:pl-6 [&_.ql-indent-2]:pl-12 [&_.ql-indent-3]:pl-18 [&_a]:font-medium [&_a]:break-words [&_a]:text-blue-400 [&_a]:underline [&_a]:decoration-blue-400/40 [&_a]:underline-offset-4 [&_blockquote]:my-8 [&_blockquote]:border-l-4 [&_blockquote]:border-white/15 [&_blockquote]:pl-5 [&_blockquote]:text-white/60 [&_blockquote]:italic [&_code]:rounded-md [&_code]:bg-white/8 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm [&_code]:break-words [&_em]:italic [&_h1]:mt-10 [&_h1]:mb-4 [&_h1]:text-4xl [&_h1]:leading-tight [&_h1]:font-extrabold [&_h1]:text-white [&_h2]:mt-9 [&_h2]:mb-4 [&_h2]:text-3xl [&_h2]:leading-tight [&_h2]:font-bold [&_h2]:text-white [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:text-white [&_img]:my-8 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-3xl [&_img]:border [&_img]:border-white/10 [&_img]:shadow-lg [&_li]:text-white/70 [&_ol]:my-6 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_p]:my-5 [&_p]:text-base [&_p]:leading-8 [&_p]:text-white/70 [&_pre]:my-8 [&_pre]:overflow-x-auto [&_pre]:rounded-2xl [&_pre]:border [&_pre]:border-white/10 [&_pre]:bg-black/30 [&_pre]:p-4 [&_pre]:text-sm [&_strong]:font-semibold [&_strong]:text-white [&_ul]:my-6 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6"
                                             dangerouslySetInnerHTML={{
                                                 __html: description,
                                             }}
                                         />
                                     ) : (
-                                        <p>
+                                        <p className="italic text-white/50">
                                             Project description belum tersedia.
                                         </p>
                                     )}
